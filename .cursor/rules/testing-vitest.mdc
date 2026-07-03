@@ -1,0 +1,43 @@
+---
+description: Vitest 単体テスト規約（JavaScript）
+globs:
+  - "resources/js/**/*.js"
+  - "resources/js/**/*.test.js"
+  - "vitest.config.js"
+---
+
+# Vitest 規約
+
+返答は日本語。指定された作業範囲以外のコードは修正しない。
+
+## 対象
+
+- `resources/js/` の **JavaScript**:
+  - ユーティリティ関数
+  - DOM 操作ロジック
+  - axios ラッパー等
+- **TypeScript は使用しない**（E2E の Playwright のみ TS）
+
+## 配置
+
+- テストファイル: 対象 JS と同階層に `*.test.js`、または `resources/js/__tests__/`
+- 設定: プロジェクトルートの `vitest.config.js`
+
+## 実行
+
+```bash
+npm run test          # 全テスト
+npm run test:watch    # ウォッチモード（設定時）
+npx vitest run <path> # 個別実行
+```
+
+## 方針
+
+- E2E（Playwright）が主。Vitest は **JS ロジックの単体テスト** に限定
+- DOM 依存のテストは jsdom 等の Vitest 環境を使用
+- Service 相当のサーバー側ロジックは PHPUnit でテスト
+
+## SDD 連携
+
+- フェーズ 3 で Vitest 対象がある場合、`03-test-plan.md` §6 に記載
+- 実装後 `meta.yaml` の `vitest.test_files` に追記

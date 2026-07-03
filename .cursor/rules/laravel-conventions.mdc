@@ -1,0 +1,60 @@
+---
+description: Laravel 12 規約（Cursor_Poc）
+globs:
+  - "app/**/*.php"
+  - "routes/**/*.php"
+  - "database/**/*.php"
+  - "config/**/*.php"
+  - "tests/**/*.php"
+  - "bootstrap/**/*.php"
+---
+
+# Laravel 規約
+
+返答は日本語。指定された作業範囲以外のコードは修正しない。
+
+## 環境
+
+- Laravel 12 / PHP 8.2
+- リポジトリ直下に Laravel アプリ（`app/`, `routes/` 等）
+- ローカル直接実行（`php artisan serve`）
+- 認証: Laravel 標準（session / Breeze 等）
+
+## アーキテクチャ
+
+- Controller は薄く保ち、ビジネスロジックは Service に置く
+- Form Request でバリデーション
+- Eloquent Model + Migration で DB 操作
+- 命名: PSR-4、`StudlyCase` クラス、`camelCase` メソッド
+
+## ディレクトリ
+
+| パス | 用途 |
+|------|------|
+| `app/Http/Controllers/` | コントローラ |
+| `app/Services/` | ビジネスロジック |
+| `app/Models/` | Eloquent モデル |
+| `app/Http/Requests/` | Form Request |
+| `routes/web.php` | Web ルート |
+| `database/migrations/` | マイグレーション |
+| `tests/Unit/` | 単体テスト |
+| `tests/Feature/` | 機能テスト |
+
+## テスト
+
+- PHPUnit は **Service 等の単体テストに限定**
+- E2E は Playwright が主。Controller の E2E 代替テストは原則書かない
+
+## コマンド
+
+```bash
+php artisan serve
+php artisan migrate
+php artisan test
+vendor/bin/phpunit --filter <TestClass>
+```
+
+## SDD 連携
+
+- 実装判断は `docs/specs/<slug>/` を正とする
+- 設計書（`02-design.md`）に記載されたクラス・メソッドから実装する

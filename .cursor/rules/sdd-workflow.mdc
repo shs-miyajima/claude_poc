@@ -1,0 +1,62 @@
+---
+description: 仕様駆動開発（SDD）のフェーズ管理と承認ゲート
+alwaysApply: true
+---
+
+# 仕様駆動開発ワークフロー
+
+返答は日本語。指定された作業範囲以外のコードは修正しない。
+
+## 正本
+
+- 実装・テストの判断は `docs/specs/` を正とする
+- 仕様は Markdown で管理する（`docs/specs/<slug>/`）
+- 外部資料（チャット入力等）と specs が食い違う場合は、実装に進まず差分を報告する
+
+## 機能 ID（TBD 運用）
+
+- 命名規則は未確定。新規は `docs/specs/<slug>/` で開始（slug は英小文字・ハイフン推奨）
+- `meta.yaml` の `display_name` に日本語の正式名称を書く
+- E2E との対応は `docs/specs/_registry.md` に追記する
+
+## フェーズと停止条件
+
+各フェーズ完了後は**停止**し、人間の承認を待つ。承認なしに次フェーズへ進まない。
+
+| フェーズ | 成果物 | 承認ファイル |
+|---------|--------|-------------|
+| 1. 仕様整理 | `01-requirements.md`, `open-questions.md` | `01-requirements.status` |
+| 2. 設計 | `02-design.md` | `02-design.status` |
+| 3. テスト設計 | `03-test-plan.md`, `03-test-plan.csv` | `03-test-plan.status` |
+| 4. 実装・テスト | コード・テストコード | — |
+
+`*.status` の値: `draft` | `approved` | `rejected`
+
+- `approved` になるまで次フェーズのファイル作成・コード編集・テスト実行をしない
+- 差戻し時は `rejected` にし、`changelog.md` に理由を記録する
+- チャットで「承認」「次へ」と明示された場合も承認とみなし、対応する `*.status` を `approved` に更新する
+
+## フェーズ 1: 仕様整理
+
+- 仕様を読み、不明点を `open-questions.md` に列挙して質問する
+- 回答を反映し `01-requirements.md` を確定案にする
+- Laravel 側とフロント（Blade / Vite / JS）の責務を明記する
+
+## フェーズ 2: 設計
+
+- `01-requirements.status` が `approved` の場合のみ着手
+- Controller / Service / Model / Migration / Blade / Route / Job のクラス名・メソッド概要を記載
+- 実装コードは書かない。人間がレビューできる粒度にする
+
+## フェーズ 3: テスト設計
+
+- `02-design.status` が `approved` の場合のみ着手
+- 正常系・異常系・境界値・権限パターン・派生パターンを網羅する
+- Playwright（E2E）を主、PHPUnit は Service 等の単体テスト、Vitest は JS 単体テストに限定
+- CSV 列形式は既存 `tests/e2e_tests/tests/test_case/` に合わせる
+
+## フェーズ 4: 実装・テスト
+
+- `03-test-plan.status` が `approved` の場合のみ着手
+- 実装 → PHPUnit（該当時）→ Vitest（該当時）→ Playwright の順で実行
+- 自動修正は最大 3 イテレーション。解決しない場合は人間にエスカレーションする

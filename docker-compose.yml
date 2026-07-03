@@ -1,0 +1,64 @@
+services:
+  app:
+    image: laravel_app:1.0
+    container_name: cursor_poc_app
+    working_dir: /var/www/html/
+    volumes:
+      - .:/var/www/html:delegated
+      - laravel_vendor:/var/www/html/vendor
+      - ./conf/php:/usr/local/etc/php
+      - ./logs/php_fpm:/var/log/php-fpm:delegated
+    environment:
+      XDEBUG_MODE: debug
+      XDEBUG_CONFIG: "client_host=host.docker.internal client_port=9003"
+    depends_on:
+      db:
+        condition: service_started
+    command: >
+      sh -c "
+        if [ ! -f vendor/autoload.php ]; then
+          echo 'ERROR: vendor/autoload.php がありません。scripts/init-vendor-volume.bat を実行してください。' &&
+          exit 1;
+        fi &&
+        if ! grep -q 'APP_KEY=base64:' .env; then php artisan key:generate --force; fi &&
+        php artisan migrate --force &&
+        php-fpm
+      "
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  nginx:
+    image: nginx:latest
+    container_name: cursor_poc_nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./public:/var/www/html/public:ro
+      - ./conf/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./logs/nginx:/var/log/nginx:delegated
+    depends_on:
+      - app
+
+  db:
+    image: postgres:18
+    container_name: cursor_poc_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: laravel_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres:/var/lib/postgresql
+
+volumes:
+  laravel_vendor:
+    name: cursor_poc_laravel_vendor
+    driver: local
+  postgres:
+    driver: local
+
+networks:
+  default:
+    name: cursor_poc_default
+    driver: bridge

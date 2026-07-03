@@ -1,0 +1,48 @@
+---
+description: Playwright E2E テスト規約（Cursor_Poc）
+globs:
+  - "tests/e2e_tests/**/*"
+---
+
+# Playwright E2E 規約
+
+返答は日本語。指定された作業範囲以外のコードは修正しない。
+
+## 配置
+
+- ルート: `tests/e2e_tests/`
+- spec ファイル: `tests/e2e_tests/tests/test_<name>.spec.ts`
+- テストケース CSV: `tests/e2e_tests/tests/test_case/<slug>/`
+- **TypeScript は E2E 専用**。フロント本体（`resources/js/`）は JavaScript
+
+## 認証
+
+- Laravel 標準認証（session / Breeze 等）
+- Cognito 等の外部 IdP は使用しない
+- ログインは Playwright 上でフォーム操作または storage state で行う
+
+## 実行
+
+```bash
+cd tests/e2e_tests
+npx playwright test
+npx playwright test tests/test_<name>.spec.ts
+```
+
+- Laravel 標準認証のため **並列実行可**（`playwright.config.ts` の `workers` は環境に応じて設定）
+- テスト前に Laravel サーバーが起動していること（`php artisan serve` 等）
+
+## テスト設計
+
+- SDD フェーズ 3 の `03-test-plan.csv` がケースの正本
+- カテゴリ接尾辞: inp / dsp / auth / evt / trn / dyn / other
+- 正常系・異常系・境界値・権限・派生パターンを網羅
+
+## SDD 連携
+
+- 新機能開始時に `docs/specs/_registry.md` に slug と spec ファイルの対応を追記
+- CSV 列形式は既存 `tests/e2e_tests/tests/test_case/` に合わせる
+
+## 注意
+
+- 連続失敗時は原因を分析してから再実行する（最大 3 イテレーション）
