@@ -14,7 +14,6 @@ laravel:
 frontend:
   js_files: []
 e2e:
-  test_case_dir: null
   spec_files: []
 vitest:
   test_files: []

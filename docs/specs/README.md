@@ -15,10 +15,14 @@ docs/specs/
 
 ## 新機能の開始手順
 
+チャットで `/sdd-new <slug> <機能の説明>` を実行すると、以下が自動で行われます。
+
 1. `_templates/` を `<slug>/` にコピー（slug は英小文字・ハイフン推奨）
 2. `meta.yaml` の `display_name` を設定
 3. `_registry.md` に行を追加
-4. Cursor で「仕様駆動で ○○ 機能を追加」と依頼（`sdd-feature` Skill が適用される）
+4. フェーズ 1（仕様整理）を開始し、不明点を質問して停止
+
+進捗の確認は `/sdd-status`（全機能のフェーズ状況を一覧表示）。
 
 ## フェーズと承認
 
@@ -31,7 +35,11 @@ docs/specs/
 
 `*.status` の値: `draft` | `approved` | `rejected`
 
-各フェーズで承認（`approved`）を得てから次へ進みます。
+status ファイルは 1 行目に状態、2 行目以降に `date:`（更新日）と `phase:` を記録します。
+
+各フェーズで承認（`approved`）を得てから次へ進みます。承認できるのは人間のみで、
+エージェントは直近のユーザー発言に明示的な承認がある場合に限り `approved` へ更新します。
+承認・差戻しのたびに `changelog.md` へ記録します。
 
 ## 機能 ID について
 

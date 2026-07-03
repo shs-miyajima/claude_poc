@@ -81,6 +81,8 @@ docker compose exec app php artisan test
 | `.cursor/rules/testing-vitest.mdc` | Vitest 規約 |
 | `.cursor/skills/sdd-bootstrap/SKILL.md` | プロジェクト立ち上げ |
 | `.cursor/skills/sdd-feature/SKILL.md` | 機能追加 |
+| `.cursor/commands/sdd-new.md` | `/sdd-new <slug>` — 新機能の開始（テンプレート配置〜フェーズ 1） |
+| `.cursor/commands/sdd-status.md` | `/sdd-status` — 全機能の SDD 進捗一覧 |
 
 ## テスト
 

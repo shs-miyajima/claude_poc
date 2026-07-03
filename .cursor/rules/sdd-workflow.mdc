@@ -32,9 +32,28 @@ alwaysApply: true
 
 `*.status` の値: `draft` | `approved` | `rejected`
 
+### status ファイルの形式
+
+1 行目に状態、2 行目以降に記録を書く。
+
+```
+approved
+date: YYYY-MM-DD
+phase: 01-requirements
+```
+
+### 承認の判定（自己承認の禁止）
+
+- 各フェーズの成果物が完成したら、**選択式の承認確認（承認 / 差戻し）を必ず提示して停止する**
+- `*.status` を `approved` に変更できるのは、**直近のユーザー発言に明示的な承認がある場合のみ**（例: 承認ボタンの選択、「承認」「フェーズ1承認」「次へ進んで」）
+- 過去の会話の解釈・エージェント自身の判断・成果物が完成したという事実を理由に `approved` へ変更してはならない
+- 「OK」「いいね」など対象フェーズが曖昧な返答の場合は、**どのフェーズへの承認かを確認してから**更新する
 - `approved` になるまで次フェーズのファイル作成・コード編集・テスト実行をしない
-- 差戻し時は `rejected` にし、`changelog.md` に理由を記録する
-- チャットで「承認」「次へ」と明示された場合も承認とみなし、対応する `*.status` を `approved` に更新する
+
+### 記録
+
+- **承認時・差戻し時のいずれも** `changelog.md` に 1 エントリ記録する（差戻し時は理由も必須）
+- 差戻し時は `rejected` にする
 
 ## フェーズ 1: 仕様整理
 
@@ -53,7 +72,7 @@ alwaysApply: true
 - `02-design.status` が `approved` の場合のみ着手
 - 正常系・異常系・境界値・権限パターン・派生パターンを網羅する
 - Playwright（E2E）を主、PHPUnit は Service 等の単体テスト、Vitest は JS 単体テストに限定
-- CSV 列形式は既存 `tests/e2e_tests/tests/test_case/` に合わせる
+- CSV 列形式は `docs/specs/_templates/03-test-plan.csv` のヘッダー行に従う
 
 ## フェーズ 4: 実装・テスト
 

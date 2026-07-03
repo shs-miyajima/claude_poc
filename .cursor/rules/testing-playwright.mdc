@@ -12,7 +12,6 @@ globs:
 
 - ルート: `tests/e2e_tests/`
 - spec ファイル: `tests/e2e_tests/tests/test_<name>.spec.ts`
-- テストケース CSV: `tests/e2e_tests/tests/test_case/<slug>/`
 - **TypeScript は E2E 専用**。フロント本体（`resources/js/`）は JavaScript
 
 ## 認証
@@ -30,7 +29,7 @@ npx playwright test tests/test_<name>.spec.ts
 ```
 
 - Laravel 標準認証のため **並列実行可**（`playwright.config.ts` の `workers` は環境に応じて設定）
-- テスト前に Laravel サーバーが起動していること（`php artisan serve` 等）
+- テスト前に `run_debug.bat verify` で Laravel（Docker、http://localhost:8000）の起動を確認する
 
 ## テスト設計
 
@@ -41,8 +40,10 @@ npx playwright test tests/test_<name>.spec.ts
 ## SDD 連携
 
 - 新機能開始時に `docs/specs/_registry.md` に slug と spec ファイルの対応を追記
-- CSV 列形式は既存 `tests/e2e_tests/tests/test_case/` に合わせる
+- テストケースの正本は `docs/specs/<slug>/03-test-plan.csv`（列形式は `docs/specs/_templates/03-test-plan.csv` に従う）
 
 ## 注意
 
+- 失敗時は `tests/e2e_tests/test-results/` のスクリーンショット・trace を確認してから原因を分析する（**推測で修正しない**）
 - 連続失敗時は原因を分析してから再実行する（最大 3 イテレーション）
+- HTML レポートは自動では開かない。必要時は `npx playwright show-report` で確認する

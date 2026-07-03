@@ -59,8 +59,11 @@ description: >-
 
 ## 承認の受け方
 
-- ユーザーが「承認」「OK」「次へ」と返答 → 対応する `*.status` を `approved` に更新
-- 差戻し → `rejected` + `changelog.md` に理由
+- 各フェーズの成果物が完成したら、**選択式の承認確認（承認 / 差戻し（理由入力））を提示して停止する**
+- **直近のユーザー発言に明示的な承認がある場合のみ** `*.status` を `approved` に更新する（自己判断での承認は禁止）
+- 「OK」など対象フェーズが曖昧な場合は、どのフェーズへの承認かを確認してから更新する
+- 承認時: `*.status` を更新（1 行目 `approved`、`date:`・`phase:` を記録）+ `changelog.md` に 1 エントリ
+- 差戻し時: `*.status` を `rejected` に + `changelog.md` に理由を記録
 
 ## 参照
 
@@ -75,22 +78,29 @@ description: >-
 ## テスト実行コマンド
 
 ```bash
-# PHPUnit（ローカル）
-php artisan test
+# PHPUnit（Docker コンテナ内）
+docker compose exec app php artisan test
 # または
-vendor/bin/phpunit --filter <TestClass>
+docker compose exec app vendor/bin/phpunit --filter <TestClass>
 
-# Vitest（プロジェクトルート）
+# Vitest（ホスト、プロジェクトルート）
 npm run test
 
-# Playwright（tests/e2e_tests ディレクトリ）
+# Playwright（ホスト、tests/e2e_tests ディレクトリ）
+# 事前に run_debug.bat verify で Laravel の起動を確認する
 cd tests/e2e_tests
 npx playwright test tests/test_<name>.spec.ts
 ```
 
 ## changelog.md の書き方
 
+承認・差戻しのたびに記録する。
+
 ```markdown
+## YYYY-MM-DD
+- フェーズ: 仕様整理
+- 操作: approved
+
 ## YYYY-MM-DD
 - フェーズ: 設計
 - 操作: rejected
