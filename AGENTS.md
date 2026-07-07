@@ -70,19 +70,24 @@ docker compose exec app php artisan test
 - 各フェーズの `*.status` が `approved` になるまで次フェーズに進まない
 - 指定範囲以外のコードは修正しない
 
-### Cursor 設定
+### Claude Code 設定
 
 | ファイル | 用途 |
 |---------|------|
-| `.cursor/rules/sdd-workflow.mdc` | SDD フェーズ・承認ゲート |
-| `.cursor/rules/laravel-conventions.mdc` | Laravel 規約 |
-| `.cursor/rules/frontend-vite-tailwind.mdc` | フロント規約 |
-| `.cursor/rules/testing-playwright.mdc` | Playwright E2E 規約 |
-| `.cursor/rules/testing-vitest.mdc` | Vitest 規約 |
-| `.cursor/skills/sdd-bootstrap/SKILL.md` | プロジェクト立ち上げ |
-| `.cursor/skills/sdd-feature/SKILL.md` | 機能追加 |
-| `.cursor/commands/sdd-new.md` | `/sdd-new <slug>` — 新機能の開始（テンプレート配置〜フェーズ 1） |
-| `.cursor/commands/sdd-status.md` | `/sdd-status` — 全機能の SDD 進捗一覧 |
+| `CLAUDE.md` | 設定エントリポイント（本ファイルと常時適用の規約を読み込む） |
+| `.claude/settings.json` | チーム共有設定（テスト・ビルド・lint コマンドの許可リスト） |
+| `.claude/rules/sdd-workflow.md` | SDD フェーズ・承認ゲート（常時適用） |
+| `.claude/rules/windows-file-editing-safety.md` | Windows でのファイル編集時の文字化け事故防止（常時適用） |
+| `.claude/agents/sdd-design-reviewer.md` | 設計の独立レビュー用サブエージェント（読み取り専用・コードベース裏取り） |
+| `.claude/agents/sdd-plan-reviewer.md` | テスト計画の独立レビュー用サブエージェント（読み取り専用） |
+| `.claude/skills/sdd-bootstrap/SKILL.md` | プロジェクト立ち上げ |
+| `.claude/skills/sdd-feature/SKILL.md` | 機能追加 |
+| `.claude/skills/laravel-conventions/SKILL.md` | Laravel 規約（実装・設計時に参照） |
+| `.claude/skills/frontend-vite-tailwind/SKILL.md` | フロント規約（実装・設計時に参照） |
+| `.claude/skills/testing-playwright/SKILL.md` | Playwright E2E 規約（テスト設計・実装時に参照） |
+| `.claude/skills/testing-vitest/SKILL.md` | Vitest 規約（テスト設計・実装時に参照） |
+| `.claude/commands/sdd-new.md` | `/sdd-new <slug>` — 新機能の開始（テンプレート配置〜フェーズ 1） |
+| `.claude/commands/sdd-status.md` | `/sdd-status` — 全機能の SDD 進捗一覧 |
 
 ## テスト
 

@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(run_debug.bat *)",
+      "Bash(run_debug.bat)",
+      "Bash(./run_debug.bat *)",
+      "Bash(cmd /c run_debug.bat *)",
+      "Bash(docker compose ps *)",
+      "Bash(docker compose ps)",
+      "Bash(docker compose logs *)",
+      "Bash(docker compose exec app php artisan *)",
+      "Bash(docker compose exec -e XDEBUG_MODE=coverage app php artisan *)",
+      "Bash(docker compose exec app vendor/bin/phpunit *)",
+      "Bash(npm run *)",
+      "Bash(npx vitest run *)",
+      "Bash(npx playwright test *)",
+      "Bash(FEATURE=* npx playwright test *)",
+      "Bash(cd tests/e2e_tests && npx playwright test *)",
+      "Bash(cd tests/e2e_tests && FEATURE=* npx playwright test *)",
+      "Bash(node scripts/sdd-lint-plan.mjs *)",
+      "Bash(node scripts/sdd-lint-testid.mjs *)",
+      "Bash(date)",
+      "Bash(date *)",
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}

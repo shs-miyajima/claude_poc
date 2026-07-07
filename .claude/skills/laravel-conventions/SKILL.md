@@ -1,0 +1,91 @@
+---
+name: laravel-conventions
+description: >-
+  Laravel 12 / PHP 8.4 のController・Service・Model・Migration・Form Request・Routeを
+  実装/修正する時、PHPUnitテストを書く/実行する時、artisanコマンドを使う時、SDDフェーズ2(設計)で
+  Laravelのクラス構成を検討する時、SDDフェーズ4(実装)でapp/・routes/・database/・config/・
+  bootstrap/・tests/*.php 配下を変更する時に使う規約。
+---
+
+# Laravel 規約
+
+対象: `app/**/*.php`, `routes/**/*.php`, `database/**/*.php`, `config/**/*.php`,
+`tests/**/*.php`, `bootstrap/**/*.php` を扱う作業。返答は日本語。
+指定された作業範囲以外のコードは修正しない。
+
+## 環境
+
+- Laravel 12 / PHP 8.4（Docker イメージ `laravel_app:1.0`）
+- リポジトリ直下に Laravel アプリ（`app/`, `routes/` 等）
+- **Docker で実行**（`run_debug.bat` で起動、http://localhost:8000）。`php artisan serve` は使用しない
+- DB: PostgreSQL 18（Docker、localhost:5433）
+- 認証: Laravel 標準（session / Breeze 等）
+
+## アーキテクチャ
+
+- Controller は薄く保ち、ビジネスロジックは Service に置く
+- Form Request でバリデーション
+- Eloquent Model + Migration で DB 操作
+- 命名: PSR-4、`StudlyCase` クラス、`camelCase` メソッド
+
+## ディレクトリ
+
+| パス | 用途 |
+|------|------|
+| `app/Http/Controllers/` | コントローラ |
+| `app/Services/` | ビジネスロジック |
+| `app/Models/` | Eloquent モデル |
+| `app/Http/Requests/` | Form Request |
+| `routes/web.php` | Web ルート |
+| `database/migrations/` | マイグレーション |
+| `tests/Unit/` | 単体テスト |
+| `tests/Feature/` | 機能テスト |
+
+## テスト
+
+- PHPUnit は **Service 等の単体テストに限定**
+- E2E は Playwright が主。Controller の E2E 代替テストは原則書かない
+
+### カバレッジ基準（実装完了の条件）
+
+- **Service・Enum 等の PHPUnit 担当範囲は原則 100%**（到達できない行は理由を
+  `03-test-plan.md` または PR に明記して許容する）
+- **プロジェクト全体では 80% 以上**（`--min=80` で強制。未達はテスト失敗になる）
+- Controller・Blade 等の未カバーは E2E（Playwright）の担当のため、PHPUnit で
+  重複してテストしない
+
+```bash
+docker compose exec -e XDEBUG_MODE=coverage app php artisan test --coverage --min=80
+```
+
+## コマンド
+
+artisan / PHPUnit は **Docker コンテナ内で実行** する。
+
+```bash
+run_debug.bat                 # 起動（起動確認込み）
+run_debug.bat verify          # 起動確認のみ
+docker compose exec app php artisan migrate
+docker compose exec app php artisan test
+docker compose exec app vendor/bin/phpunit --filter <TestClass>
+```
+
+## Test ID アノテーション規約（突合チェックに必須）
+
+各テストメソッドの直前の docコメントに、対応する CSV の Test ID を記載する。
+この規約により `node scripts/sdd-lint-testid.mjs <slug>` でテスト実装の漏れを機械検出できる。
+
+```php
+/**
+ * PHPUnit-inp-001: 理由 任意入力なし
+ */
+public function test_理由が空でも申請が作成される(): void
+```
+
+- docコメント形式: `* <Test ID>: <説明>`（Test ID は `PHPUnit-{category}-{nnn}` 形式）
+- 1 つのテストメソッドに対して 1 行のアノテーション
+
+## SDD 連携
+
+- 実装判断は `docs/specs/<slug>/` を正とする
+- 設計書（`02-design.md`）に記載されたクラス・メソッドから実装する

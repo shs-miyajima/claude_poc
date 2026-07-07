@@ -1,0 +1,130 @@
+---
+name: testing-playwright
+description: >-
+  Playwright E2Eテスト(TypeScript)を実装/修正/実行する時、tests/e2e_tests配下を変更する時、
+  SDDフェーズ3(テスト設計)で03-test-plan.csvのE2Eケースを作成する時、SDDフェーズ4(実装)で
+  E2Eテストコードを書く時に使う規約。
+---
+
+# Playwright E2E 規約
+
+対象: `tests/e2e_tests/**/*` を扱う作業。返答は日本語。
+指定された作業範囲以外のコードは修正しない。
+
+## 配置
+
+- ルート: `tests/e2e_tests/`
+- spec ファイル: `tests/e2e_tests/tests/test_<name>.spec.ts`
+- **TypeScript は E2E 専用**。フロント本体（`resources/js/`）は JavaScript
+
+## 認証
+
+- Laravel 標準認証（session / Breeze 等）
+- Cognito 等の外部 IdP は使用しない
+- ログインは Playwright 上でフォーム操作または storage state で行う
+
+## 実行
+
+```bash
+cd tests/e2e_tests
+# エビデンス（test-results / playwright-report）を機能単位のフォルダに出力するため
+# FEATURE に docs/specs の slug を指定して実行する（未指定時は all フォルダ）
+FEATURE=001_create_management npx playwright test tests/test_<name>.spec.ts
+```
+
+- Claude Code の Bash ツールは Git Bash（POSIX sh）のため、上記の bash 構文を使う。
+  `$env:FEATURE = '...'` は PowerShell 構文であり、**bash ではエラーにならず環境変数が
+  設定されない**（エビデンスが `all` フォルダに出力される事故になる）ので使わない
+- 人間が PowerShell ターミナルから手動実行する場合のみ
+  `$env:FEATURE = '<slug>'; npx playwright test ...` を使う
+
+- Laravel 標準認証のため **並列実行可**（`playwright.config.ts` の `workers` は環境に応じて設定）
+- テスト前に `run_debug.bat verify` で Laravel（Docker、http://localhost:8000）の起動を確認する
+- **フロントエンド資産は `globalSetup`（`tests/e2e_tests/global-setup.ts`）が実行のたびに
+  自動で `npm run build` する**。`resources/js` を変更した後に手動でビルドし直す必要はない
+  （ビルド未反映のまま実行して原因不明の失敗になる事故を防ぐための仕組み）
+
+## DB 状態（実行前の初期化）
+
+E2E テストは申請作成・ステータス更新等で DB を変更するため、実行を繰り返すとデータが蓄積する。
+
+- **E2E 実行前に DB を初期化する**:
+
+```bash
+docker compose exec app php artisan migrate:fresh --seed
+```
+
+- テストコードは **Seeder 投入直後の状態を前提** に書く。過去の実行で蓄積したデータや、
+  他のテストが作成したデータに依存しない（依存が必要な場合はテスト内で作成する）
+- 件数・0 件表示・一覧順序を検証するケースは、初期化直後の Seeder データを基準にする
+
+### Seeder-first（開発 DB は使い捨て）
+
+- 開発 DB は `migrate:fresh --seed` でいつでも再現できる状態を保つ。**消えて困るデータを DB に置かない**
+- 手動確認で繰り返し使いたいデータ（特定の状態の申請・ユーザー等）は、手入力ではなく
+  **Seeder に追加** する。これにより初期化＝「いつものデータの復元」になる
+- どうしても消したくない一時データがある場合のみ、初期化前に `pg_dump` 等でバックアップを取る
+
+## セレクタ
+
+- E2E のセレクタは `data-testid` を優先する（CSS クラス・表示文言・DOM 構造に依存しない）
+- 実装時の `data-testid` 付与規約は `frontend-vite-tailwind` skill（`.claude/skills/frontend-vite-tailwind/SKILL.md`）を参照
+
+## 並列実行安全性（`fullyParallel: true`）
+
+`playwright.config.ts` は `fullyParallel: true` のため、複数ケースが同時に実行される。
+「他のケースを実行しなくても単独で成立する」だけでなく、**他のケースと同時に実行されても
+干渉しない**ように書く。
+
+- Seeder 投入直後の共有データ（一覧の初期件数・特定ユーザー等）を**更新・削除する**ケースは、
+  そのケース専用のレコードをテスト内で新規作成してから操作する（既存の共有レコードを書き換えない）
+- 件数・並び順など共有データを**参照するだけ**のケースは、他のケースがそのデータを更新しない前提
+  （上記の徹底）が成立していれば問題ない
+- 採番・重複チェック等、並列実行で競合しうる処理は `03-test-plan.md` の
+  「同時実行・競合」「並列実行安全性」の観点で個別に検討する
+
+## フレーキーテスト対策
+
+- 固定時間の待機（`page.waitForTimeout()`）に頼らない。要素の出現・状態変化・
+  ネットワーク完了など、**待つべき対象を明示した待機**（ロケータの自動待機、
+  `waitForResponse` 等）を使う
+- 非同期処理（axios 通信後の DOM 更新等）の完了を、タイムアウトではなく
+  結果として現れる DOM の状態（`data-testid` 要素の出現・文言変化）で判定する
+- CI の `retries: 2` はネットワーク等の偶発的な失敗を吸収するためのものであり、
+  **実装や設計の不備をリトライで隠さない**。同じケースが繰り返し失敗する場合は
+  フレーキーの原因（待機不足・並列実行時のデータ競合等）を分析してから修正する
+
+## テスト設計
+
+- SDD フェーズ 3 の `03-test-plan.csv` がケースの正本
+- カテゴリ接尾辞: inp / dsp / auth / evt / trn / dyn / other
+- 正常系・異常系・境界値・権限・派生パターンを網羅
+
+## Test ID アノテーション規約（突合チェックに必須）
+
+各 `test(...)` の直前行に、対応する CSV の Test ID を以下の形式でコメントする。
+この規約により `node scripts/sdd-lint-testid.mjs <slug>` でテスト実装の漏れを機械検出できる。
+
+```typescript
+// E2E-trn-001: /equipment-loans 初期表示
+test('備品貸出管理画面が表示され初期ユーザーは最初の一般社員', async ({ page }) => {
+```
+
+- コメント形式: `// <Test ID>: <説明>`（Test ID は `E2E-{category}-{nnn}` 形式）
+- 1 つの `test(...)` に対して 1 行のアノテーション（複数の Test ID を 1 テストに紐付けない）
+- `describe` ブロック内のテストにも同様に付ける
+
+## SDD 連携
+
+- 新機能開始時に `docs/specs/_registry.md` に slug と spec ファイルの対応を追記
+- テストケースの正本は `docs/specs/<slug>/03-test-plan.csv`（列形式は `docs/specs/_templates/03-test-plan.csv` に従う）
+
+## 注意
+
+- **環境制約（2026-07 解決済み）**: 社内 SSL 復号プロキシにより Node.js 標準ではブラウザを
+  ダウンロードできない。ユーザー環境変数 `NODE_OPTIONS=--use-system-ca` を設定して
+  Windows 証明書ストアを参照させ、`npx playwright install chromium` で Playwright 版
+  Chromium を使用する（`channel: 'msedge'` は EDR によりクラッシュするため使用しない）
+- 失敗時は `tests/e2e_tests/test-results/` のスクリーンショット・trace を確認してから原因を分析する（**推測で修正しない**）
+- 連続失敗時は原因を分析してから再実行する（最大 3 イテレーション）
+- HTML レポートは自動では開かない。必要時は `npx playwright show-report` で確認する
