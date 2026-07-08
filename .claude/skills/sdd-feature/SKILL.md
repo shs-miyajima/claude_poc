@@ -21,7 +21,10 @@ description: >-
 
 - [ ] `01-requirements.md` を作成・更新
 - [ ] `effort-report.md` の「§1 人手想定工数」にフェーズ別見積を記入（根拠つき）
-- [ ] 不明点を `open-questions.md` に記載し、ユーザーに質問
+- [ ] 不明点を `open-questions.md` に記載し、ユーザーに質問（推測・仮定で埋めない。
+      仮置きでの先行は禁止。詳細: `.claude/rules/sdd-workflow.md`「フェーズ 1 > 仮定の禁止」）
+- [ ] `open-questions.md` の全項目が `resolved` / `dropped`（`open` が 1 件でも残っている間は
+      承認確認を提示せず、質問と反映を繰り返す）
 - [ ] Laravel / フロント（Blade / Vite / JS）の責務分界を記載
 - [ ] 確定後、ユーザー承認を得て `01-requirements.status` を `approved` に
 
