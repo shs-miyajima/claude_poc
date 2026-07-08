@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 // エビデンスを機能（docs/specs/<slug>）単位で分けて出力する。
-// 例: $env:FEATURE='001_create_management'; npx playwright test tests/test_<name>.spec.ts
+// 例: $env:FEATURE='<slug>'; npx playwright test tests/test_<name>.spec.ts
 // 未指定の場合は 'all' フォルダに出力する
 const feature = process.env.FEATURE ?? 'all';
 

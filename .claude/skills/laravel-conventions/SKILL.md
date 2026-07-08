@@ -77,9 +77,9 @@ docker compose exec app vendor/bin/phpunit --filter <TestClass>
 
 ```php
 /**
- * PHPUnit-inp-001: 理由 任意入力なし
+ * PHPUnit-inp-001: 任意項目 空入力で登録成功
  */
-public function test_理由が空でも申請が作成される(): void
+public function test_任意項目が空でも登録できる(): void
 ```
 
 - docコメント形式: `* <Test ID>: <説明>`（Test ID は `PHPUnit-{category}-{nnn}` 形式）

@@ -3,7 +3,7 @@
  * sdd-lint-plan.mjs — テスト計画 CSV の静的検証
  *
  * Usage: node scripts/sdd-lint-plan.mjs <slug>
- *        npm run lint:sdd -- 001_create_management
+ *        npm run lint:sdd -- <slug>（例: csv-import）
  *
  * 検証内容:
  *   1. Test ID が空でないこと
@@ -256,7 +256,7 @@ function main() {
   const slug = process.argv[2];
   if (!slug) {
     console.error('Usage: node scripts/sdd-lint-plan.mjs <slug>');
-    console.error('       npm run lint:sdd -- 001_create_management');
+    console.error('       npm run lint:sdd -- <slug>');
     process.exit(1);
   }
 

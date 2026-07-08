@@ -57,7 +57,7 @@ npx vitest run <path>  # 個別実行
 
 ```javascript
 // Vitest-other-001: 一覧 API URL 組み立て OK
-it('一覧取得で mock_user_id と search がクエリに付与される', async () => {
+it('一覧取得で検索条件がクエリパラメータに付与される', async () => {
 ```
 
 - コメント形式: `// <Test ID>: <説明>`（Test ID は `Vitest-{category}-{nnn}` 形式）

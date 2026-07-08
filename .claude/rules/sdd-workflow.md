@@ -202,7 +202,7 @@ phase: 01-requirements
    書き込みを構成レベルで防げる。汎用の Explore エージェントは抜粋読みで全文検証に不向きなため
    使わない）
 2. レビュー対象として `01-requirements.md` / `02-design.md` / `03-test-plan.md` / 各 CSV のパスを渡し、
-   `docs/specs/_templates/03-test-plan-review-checklist.md` の全項目を検証させ、項目ごとに
+   `docs/specs/<slug>/03-test-plan-review-checklist.md` の全項目を検証させ、項目ごとに
    ✓ / ✕ と理由を判定させる
 3. サブエージェントの指摘のうち、**機械的に自動修正可能なもの**
    （カバレッジ表の空欄、曖昧な期待結果の言い換え、出典 ID の記載漏れ、CSV 粒度の分割漏れ等）は

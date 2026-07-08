@@ -20,7 +20,7 @@ tools: Read, Grep, Glob
 - `docs/specs/<slug>/02-design.md`（設計）
 - `docs/specs/<slug>/03-test-plan.md`（テスト計画・要件カバレッジ表）
 - `docs/specs/<slug>/03-test-plan.csv` および `03-test-plan-phpunit.csv` / `03-test-plan-vitest.csv`（存在する場合）
-- `docs/specs/_templates/03-test-plan-review-checklist.md`（検証チェックリスト）
+- `docs/specs/<slug>/03-test-plan-review-checklist.md`（検証チェックリスト）
 
 ## 手順
 

@@ -3,7 +3,7 @@
  * sdd-lint-testid.mjs — テスト計画 CSV とテストコードの Test ID 突合
  *
  * Usage: node scripts/sdd-lint-testid.mjs <slug>
- *        npm run lint:sdd:testid -- 001_create_management
+ *        npm run lint:sdd:testid -- <slug>（例: csv-import）
  *
  * 検証内容:
  *   1. CSV の E2E Test ID が Playwright spec（.spec.ts）に存在するか（未実装検出 → ERROR）
@@ -114,7 +114,7 @@ function main() {
   const slug = process.argv[2];
   if (!slug) {
     console.error('Usage: node scripts/sdd-lint-testid.mjs <slug>');
-    console.error('       npm run lint:sdd:testid -- 001_create_management');
+    console.error('       npm run lint:sdd:testid -- <slug>');
     process.exit(1);
   }
 

@@ -29,7 +29,7 @@ description: >-
 cd tests/e2e_tests
 # エビデンス（test-results / playwright-report）を機能単位のフォルダに出力するため
 # FEATURE に docs/specs の slug を指定して実行する（未指定時は all フォルダ）
-FEATURE=001_create_management npx playwright test tests/test_<name>.spec.ts
+FEATURE=<slug> npx playwright test tests/test_<name>.spec.ts
 ```
 
 - Claude Code の Bash ツールは Git Bash（POSIX sh）のため、上記の bash 構文を使う。
@@ -106,8 +106,8 @@ docker compose exec app php artisan migrate:fresh --seed
 この規約により `node scripts/sdd-lint-testid.mjs <slug>` でテスト実装の漏れを機械検出できる。
 
 ```typescript
-// E2E-trn-001: /equipment-loans 初期表示
-test('備品貸出管理画面が表示され初期ユーザーは最初の一般社員', async ({ page }) => {
+// E2E-trn-001: 対象画面 初期表示
+test('対象画面が表示され、Seeder 初期データが一覧に表示される', async ({ page }) => {
 ```
 
 - コメント形式: `// <Test ID>: <説明>`（Test ID は `E2E-{category}-{nnn}` 形式）
