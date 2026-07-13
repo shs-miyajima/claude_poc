@@ -1,1 +1,137 @@
 Test ID,カテゴリ,対象(項目/機能),前提条件,入力/操作,手順,期待結果,備考,出典
+PU-001-inp,inp,LoginRequest,ログイン画面が表示可能な状態,メールアドレス欄を空にして送信,POST /login にemail=空・password=有効値,422が返り「メールアドレスは必須です。」が返る,layer:http target:POST /login,VAL-01
+PU-002-inp,inp,LoginRequest,ログイン画面が表示可能な状態,パスワード欄を空にして送信,POST /login にemail=有効値・password=空,422が返り「パスワードは必須です。」が返る,layer:http target:POST /login,VAL-01
+PU-003-auth,auth,ログイン(管理者),企業A(code=C0001)・有効な管理者user1@aが存在する,正しい企業コード+メール+パスワードを入力,POST /login,認証成功しリダイレクト先がcompany.homeになる,layer:http,UC-01;AC-01
+PU-004-auth,auth,ログイン(ユーザー),企業A・有効なユーザーuser2@aが存在する,正しい企業コード+メール+パスワードを入力,POST /login,認証成功しリダイレクト先がuser.homeになる,layer:http,UC-01;AC-01
+PU-005-auth,auth,ログイン(スーパーユーザー),シーダー投入済みスーパーユーザーが存在する,企業コード空欄+正しいメール+パスワードを入力,POST /login,認証成功しリダイレクト先がsuper.companies.indexになる,layer:http,UC-02;AC-02
+PU-006-auth,auth,ログイン失敗(企業コード不存在),企業コードC9999は存在しない,企業コードC9999+任意のメール+パスワードを入力,POST /login,422が返り「企業コード、メールアドレス、またはパスワードが正しくありません。」が返る,layer:http,VAL-02;AC-03
+PU-007-auth,auth,ログイン失敗(企業コード形式不正),企業Aが存在する,企業コードに6文字の値を入力,POST /login,422が返りVAL-02と同一の統一メッセージが返る,layer:http,VAL-02
+PU-008-auth,auth,ログイン失敗(メール不存在),企業Aが存在し当該企業に該当メールのユーザーがいない,正しい企業コード+存在しないメール+任意パスワードを入力,POST /login,422が返りVAL-02と同一の統一メッセージが返る,layer:http,VAL-02;AC-03
+PU-009-auth,auth,ログイン失敗(パスワード不一致),企業A・有効なユーザーuser2@aが存在する,正しい企業コード+メール+誤ったパスワードを入力,POST /login,422が返りVAL-02と同一の統一メッセージが返る,layer:http,VAL-02;AC-03
+PU-010-auth,auth,ログイン失敗(無効化済みユーザー),企業A・無効化済みユーザーuser3@aが存在する,正しい企業コード+メール+パスワードを入力,POST /login,422が返りVAL-02と同一の統一メッセージが返り認証されない,layer:http,VAL-02;UC-04;AC-03
+PU-011-auth,auth,ログイン失敗(無効化済み企業),無効化済み企業B(code=C0002)・有効な管理者が存在する,正しい企業コード+メール+パスワードを入力,POST /login,422が返りVAL-02と同一の統一メッセージが返る,layer:http,VAL-02
+PU-012-auth,auth,認証失敗メッセージの一致確認,企業A・無効化済みユーザーuser3@aが存在する,(a)存在しないメール (b)user3@aの無効化済みアカウントでログイン,POST /loginを2パターン実行,(a)と(b)のエラーメッセージ文字列が完全に一致する,layer:http NFR-05確認,NFR-05
+PU-013-auth,auth,ログアウト,企業A・有効な管理者でログイン済みセッションがある,ログアウト操作後に保護画面へアクセス,POST /logout後にGET /company/homeへアクセス,ログアウト後にログイン画面へリダイレクトされる,layer:http,UC-03;AC-04
+PU-014-auth,auth,未ログインアクセス,未ログイン状態,認証必須URLへ直接アクセス,GET /company/homeへ直接アクセス,ログイン画面へリダイレクトされる,layer:http,NFR-02;AC-05
+PU-015-auth,auth,シーダー投入済みスーパーユーザーログイン,SuperUserSeeder実行済み,.envのSUPER_USER_EMAIL/PASSWORDを入力,POST /login,認証成功しログインできる,layer:integration,AC-19
+PU-016-auth,auth,HTTP認可(user→super),role=userのユーザーでログイン済み,スーパーユーザー専用URLへ直接アクセス,GET /super/companies,403が返る,layer:http,AC-06;NFR-03
+PU-017-auth,auth,HTTP認可(user→company/admins),role=userのユーザーでログイン済み,管理者管理URLへ直接アクセス,GET /company/admins,403が返る,layer:http,AC-06;NFR-03
+PU-018-auth,auth,HTTP認可(user→company/users),role=userのユーザーでログイン済み,ユーザー管理URLへ直接アクセス,GET /company/users,403が返る,layer:http,AC-06;NFR-03
+PU-019-auth,auth,HTTP認可(user→company/departments),role=userのユーザーでログイン済み,部署管理URLへ直接アクセス,GET /company/departments,403が返る,layer:http,AC-06;NFR-03
+PU-020-auth,auth,HTTP認可(admin→super),role=adminの管理者でログイン済み,スーパーユーザー専用URLへ直接アクセス,GET /super/companies,403が返る,layer:http,NFR-03
+PU-021-auth,auth,HTTP認可(admin→company/admins),role=adminの管理者でログイン済み,管理者管理URL(スーパーユーザー専用)へ直接アクセス,GET /company/admins,403が返る,layer:http Q-11,NFR-03
+PU-022-auth,auth,HTTP認可(他企業ユーザー編集),企業Aの管理者でログイン済み・企業Bのユーザーuser4@bが存在する,他企業のユーザー編集URLへ直接アクセス,GET /company/users/{user4}/edit,403が返る,layer:http,AC-07;NFR-03
+PU-023-auth,auth,HTTP認可(他企業部署編集),企業Aの管理者でログイン済み・企業Bの部署dept1@bが存在する,他企業の部署編集URLへ直接アクセス,GET /company/departments/{dept1}/edit,403が返る,layer:http,NFR-03
+PU-024-auth,auth,無効化済み企業の編集アクセス,無効化済み企業Bが存在する,無効化済み企業の編集URLへ直接アクセス,GET /super/companies/{companyB}/edit,403が返る,layer:http,AC-26
+PU-025-auth,auth,無効化済み管理者の編集アクセス,企業A・無効化済み管理者admin2@aが存在する,無効化済み管理者の編集URLへ直接アクセス,GET /company/admins/{admin2}/edit,403が返る,layer:http,AC-26
+PU-026-auth,auth,無効化済みユーザーの編集アクセス,企業A・無効化済みユーザーuser3@aが存在する,無効化済みユーザーの編集URLへ直接アクセス,GET /company/users/{user3}/edit,403が返る,layer:http,AC-26
+PU-027-auth,auth,無効化済み部署の編集アクセス,企業A・無効化済み部署dept2@aが存在する,無効化済み部署の編集URLへ直接アクセス,GET /company/departments/{dept2}/edit,403が返る,layer:http,AC-26
+PU-028-auth,auth,無効化済み企業への画面切替,無効化済み企業Bが存在しスーパーユーザーでログイン済み,無効化済み企業への切替を試みる,POST /super/companies/{companyB}/switch,403が返る,layer:http,UC-08;Q-15
+PU-029-auth,auth,EnsureAccountActive,企業A・有効な管理者でログイン済みセッションがある状態で当該管理者を別経路で無効化,次のリクエストとして保護画面へアクセス,GET /company/home,ログアウトされログイン画面へリダイレクトされる,layer:integration,AC-09
+PU-030-auth,auth,SetCompanyContext(admin自社スコープ),企業A・企業Bそれぞれにユーザーが存在し企業Aの管理者でログイン済み,ユーザー一覧を取得,GET /company/users,一覧に企業Aのユーザーのみ表示され企業Bのユーザーは含まれない,layer:integration,NFR-03
+PU-031-auth,auth,SetCompanyContext(切替前アクセス),スーパーユーザーでログイン済みだが個別企業画面への切替を行っていない,個別企業画面へ直接アクセス,GET /company/home,403が返る,layer:integration,NFR-03
+PU-032-other,other,CompanyService::nextCode(初回),companiesテーブルが空,企業名「株式会社サンプル」で登録,CompanyService::create(['name'=>'株式会社サンプル']),企業コードC0001が採番される,layer:unit,UC-05
+PU-033-other,other,CompanyService::nextCode(連番),既存最大コードがC0005の企業が存在する,企業名「次の企業」で登録,CompanyService::create(['name'=>'次の企業']),企業コードC0006が採番される,layer:unit,UC-05
+PU-034-evt,evt,CompanyService::create,スーパーユーザーでログイン済み,企業名「株式会社サンプル」を入力し登録,POST /super/companies,企業一覧に「株式会社サンプル」と採番済みの企業コードが表示される,layer:integration,UC-05;AC-08
+PU-035-inp,inp,CompanyStoreRequest,スーパーユーザーでログイン済み,企業名を空にして送信,POST /super/companies,422が返り「企業名は必須です。」が返る,layer:http,VAL-03
+PU-036-inp,inp,CompanyStoreRequest,スーパーユーザーでログイン済み,企業名に101文字を入力して送信,POST /super/companies,422が返り「企業名は100文字以内で入力してください。」が返る,layer:http,VAL-03
+PU-037-inp,inp,CompanyStoreRequest,スーパーユーザーでログイン済み,企業名に100文字を入力して送信,POST /super/companies,登録が成功し一覧に表示される,layer:http VAL-03境界OK,VAL-03
+PU-038-evt,evt,CompanyService::update,企業Aが存在しスーパーユーザーでログイン済み,企業名を「新会社名」に変更して送信,PUT /super/companies/{companyA},企業一覧・編集画面の企業名が「新会社名」に更新される,layer:integration,UC-06
+PU-039-inp,inp,CompanyUpdateRequest,企業Aが存在しスーパーユーザーでログイン済み,企業名を空にして送信,PUT /super/companies/{companyA},422が返り「企業名は必須です。」が返りDBの企業名が変更前の値のまま維持される,layer:http,VAL-03
+PU-040-evt,evt,CompanyService::deactivate,企業A・配下の管理者admin1@a・ユーザーuser1@aが存在する,企業Aを無効化,POST /super/companies/{companyA}/deactivate,企業Aとadmin1@a・user1@aがすべて無効化されるが企業Aの部署は無効化されない,layer:integration,UC-07;AC-09
+PU-041-evt,evt,CompanyService::activate,無効化済み企業B(配下の管理者admin2@bも無効化済み)が存在する,企業Bを再有効化,POST /super/companies/{companyB}/activate,企業Bは有効に戻るがadmin2@bは無効化されたままである,layer:integration,UC-19;AC-23
+PU-042-evt,evt,CompanySwitchController::enter,有効企業Cが存在しスーパーユーザーでログイン済み,企業Cへの切替を実行,POST /super/companies/{companyC}/switch,セッションにacting_company_idが保存されGET /company/homeで企業Cのデータが表示される,layer:http,UC-08;AC-10
+PU-043-evt,evt,CompanySwitchController::exit,企業Cへ切替済みのスーパーユーザーセッションがある,全体画面へ戻る操作を実行,POST /super/switch/exit,セッションのacting_company_idが削除されGET /super/companies/indexへ遷移できる,layer:http,UC-08
+PU-044-dsp,dsp,企業一覧の無効表示,無効化済み企業Bが存在する,企業一覧を取得,GET /super/companies,一覧のcompanyBの行に「無効」の状態表示があり切替導線が表示されない,layer:http,AC-24
+PU-045-evt,evt,AdminService::create,企業Aが存在しスーパーユーザーでログイン済み,氏名・メール・初期パスワードを入力し登録,POST /company/admins,role=adminの管理者が作成されHash::checkでパスワード照合できる,layer:integration,UC-09;AC-11
+PU-046-inp,inp,AdminStoreRequest,企業Aが存在しスーパーユーザーでログイン済み,氏名を空にして送信,POST /company/admins,422が返り「氏名は必須です。」が返る,layer:http,VAL-04
+PU-047-inp,inp,AdminStoreRequest,企業Aが存在しスーパーユーザーでログイン済み,メールを空にして送信,POST /company/admins,422が返り「メールアドレスは必須です。」が返る,layer:http,VAL-05
+PU-048-inp,inp,AdminStoreRequest,企業Aが存在しスーパーユーザーでログイン済み,メールに形式不正な値「abc」を入力して送信,POST /company/admins,422が返り「メールアドレスの形式が正しくありません。」が返る,layer:http,VAL-05
+PU-049-inp,inp,AdminStoreRequest,企業Aが存在しスーパーユーザーでログイン済み,メールに256文字の値を入力して送信,POST /company/admins,422が返り「メールアドレスは255文字以内で入力してください。」が返る,layer:http,VAL-05
+PU-050-inp,inp,AdminStoreRequest,企業A・無効化済み管理者admin3@a(email=dup@a)が存在する,同一メールdup@aを入力して送信,POST /company/admins,422が返り「このメールアドレスは既に登録されています。」が返る,layer:http,VAL-06
+PU-051-inp,inp,AdminStoreRequest,企業Aが存在しスーパーユーザーでログイン済み,初期パスワードを空にして送信,POST /company/admins,422が返り「初期パスワードは必須です。」が返る,layer:http,VAL-07
+PU-052-inp,inp,AdminStoreRequest,企業Aが存在しスーパーユーザーでログイン済み,初期パスワードに7文字の値を入力して送信,POST /company/admins,422が返り「パスワードは8文字以上で入力してください。」が返る,layer:http VAL-07境界NG,VAL-07
+PU-053-inp,inp,AdminStoreRequest,企業Aが存在しスーパーユーザーでログイン済み,初期パスワードに8文字の値を入力して送信,POST /company/admins,登録が成功し管理者一覧に表示される,layer:http VAL-07境界OK,VAL-07
+PU-054-evt,evt,AdminService::update,企業A・管理者admin1@aが存在しスーパーユーザーでログイン済み,パスワード欄を空にし氏名のみ変更して送信,PUT /company/admins/{admin1},氏名が更新されadmin1@aの旧パスワードでログインできる,layer:integration,UC-10
+PU-055-inp,inp,AdminUpdateRequest,企業A・管理者admin1@aが存在しスーパーユーザーでログイン済み,パスワード欄を空にして送信,PUT /company/admins/{admin1},422にならず更新が成功する,layer:http Q-08,VAL-07
+PU-056-evt,evt,AdminService::deactivate,企業A・管理者admin1@aが存在しスーパーユーザーでログイン済み,管理者を無効化,POST /company/admins/{admin1}/deactivate,admin1@aが無効化されログインできなくなる,layer:integration,UC-11
+PU-057-evt,evt,AdminService::activate,企業A・無効化済み管理者admin2@aが存在しスーパーユーザーでログイン済み,管理者を再有効化,POST /company/admins/{admin2}/activate,admin2@aが有効化され再びログインできる,layer:integration,UC-20;AC-22
+PU-058-evt,evt,UserService::create,企業A・部署dept1@aが存在し管理者でログイン済み,氏名・メール・初期パスワード・生年月日・入社年月日・性別・部署を入力し登録,POST /company/users,企業Aのユーザーとして作成されユーザー一覧に表示される,layer:integration,UC-12;AC-12
+PU-059-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,氏名を空にして送信,POST /company/users,422が返り「氏名は必須です。」が返る,layer:http,VAL-04
+PU-060-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,氏名に101文字を入力して送信,POST /company/users,422が返り「氏名は100文字以内で入力してください。」が返る,layer:http,VAL-04
+PU-061-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,氏名に100文字を入力して送信,POST /company/users,登録が成功する,layer:http VAL-04境界OK,VAL-04
+PU-062-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,メールを空にして送信,POST /company/users,422が返り「メールアドレスは必須です。」が返る,layer:http,VAL-05
+PU-063-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,メールに形式不正な値「abc」を入力して送信,POST /company/users,422が返り「メールアドレスの形式が正しくありません。」が返る,layer:http,VAL-05
+PU-064-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,メールに256文字の値を入力して送信,POST /company/users,422が返り「メールアドレスは255文字以内で入力してください。」が返る,layer:http,VAL-05
+PU-065-inp,inp,UserStoreRequest,企業A・無効化済みユーザーuser5@a(email=dup2@a)が存在する,同一メールdup2@aを入力して送信,POST /company/users,422が返り「このメールアドレスは既に登録されています。」が返る,layer:http,VAL-06
+PU-066-inp,inp,UserStoreRequest,企業Bに同一メールdup3@のユーザーが存在し企業Aの管理者でログイン済み,企業AでメールdupB@を入力して送信,POST /company/users,企業単位一意のため登録が成功する,layer:http VAL-06 OKケース,VAL-06
+PU-067-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,初期パスワードを空にして送信,POST /company/users,422が返り「初期パスワードは必須です。」が返る,layer:http,VAL-07
+PU-068-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,初期パスワードに7文字の値を入力して送信,POST /company/users,422が返り「パスワードは8文字以上で入力してください。」が返る,layer:http VAL-07境界NG,VAL-07
+PU-069-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,初期パスワードに8文字の値を入力して送信,POST /company/users,登録が成功する,layer:http VAL-07境界OK,VAL-07
+PU-070-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,初期パスワードに256文字を入力して送信,POST /company/users,422が返り「パスワードは255文字以内で入力してください。」が返る,layer:http,VAL-07
+PU-071-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,生年月日を空にして送信,POST /company/users,422が返り「生年月日は必須です。」が返る,layer:http,VAL-08
+PU-072-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,生年月日に「2020/13/40」を入力して送信,POST /company/users,422が返り「生年月日はYYYY-MM-DD形式の正しい日付で入力してください。」が返る,layer:http,VAL-08
+PU-073-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,入社年月日を空にして送信,POST /company/users,422が返り「入社年月日は必須です。」が返る,layer:http,VAL-08
+PU-074-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,入社年月日に「2020/13/40」を入力して送信,POST /company/users,422が返り「入社年月日はYYYY-MM-DD形式の正しい日付で入力してください。」が返る,layer:http,VAL-08
+PU-075-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,性別を未選択で送信,POST /company/users,422が返り「性別は必須です。」が返る,layer:http,VAL-09
+PU-076-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,性別に不正な値「unknown」を入力して送信,POST /company/users,422が返り「性別が正しくありません。」が返る,layer:http,VAL-09
+PU-077-inp,inp,UserStoreRequest,企業Aが存在し管理者でログイン済み,部署を未選択で送信,POST /company/users,422が返り「部署は必須です。」が返る,layer:http,VAL-10
+PU-078-inp,inp,UserStoreRequest,企業A・無効化済み部署dept2@aが存在し管理者でログイン済み,新規登録でdept2@aを指定して送信,POST /company/users,422が返り「部署が正しくありません。」が返る,layer:http,VAL-10
+PU-079-inp,inp,UserStoreRequest,企業Bの部署dept1@bが存在し企業Aの管理者でログイン済み,企業Aのユーザー登録でdept1@bを指定して送信,POST /company/users,422が返り「部署が正しくありません。」が返る,layer:http,VAL-10
+PU-080-evt,evt,UserService::update,企業A・ユーザーuser1@aが存在し管理者でログイン済み,パスワード欄を空にし氏名のみ変更して送信,PUT /company/users/{user1},氏名が更新されuser1@aの旧パスワードでログインできる,layer:integration,UC-13;AC-13
+PU-081-inp,inp,UserUpdateRequest,企業A・ユーザーuser6@aの所属部署dept3@aが無効化済みである,部署を変更せず氏名のみ変更して送信,PUT /company/users/{user6},422にならず更新が成功し所属表示がdept3@aのまま維持される,layer:http Q-16,VAL-10;AC-25
+PU-082-inp,inp,UserUpdateRequest,企業A・ユーザーuser6@a(現所属dept3@aが無効化済み)・別の無効化済み部署dept4@aが存在する,部署をdept3@aからdept4@aに変更して送信,PUT /company/users/{user6},422が返り「部署が正しくありません。」が返る,layer:http Q-16,VAL-10
+PU-083-evt,evt,UserService::deactivate,企業A・ユーザーuser1@aが存在し管理者でログイン済み,ユーザーを無効化,POST /company/users/{user1}/deactivate,user1@aが無効化されログインできなくなるが過去の回答データ相当は保持される,layer:integration,UC-14;AC-14
+PU-084-evt,evt,UserService::activate,企業A・無効化済みユーザーuser3@aが存在し管理者でログイン済み,ユーザーを再有効化,POST /company/users/{user3}/activate,user3@aが有効化され再びログインできる,layer:integration,UC-21;AC-22
+PU-085-evt,evt,DepartmentService::create,企業Aが存在し管理者でログイン済み,部署名「人事部」を入力し登録,POST /company/departments,部署マスタに「人事部」が追加され一覧に表示される,layer:integration,UC-16;AC-18
+PU-086-inp,inp,DepartmentStoreRequest,企業Aが存在し管理者でログイン済み,部署名を空にして送信,POST /company/departments,422が返り「部署名は必須です。」が返る,layer:http,VAL-11
+PU-087-inp,inp,DepartmentStoreRequest,企業Aが存在し管理者でログイン済み,部署名に101文字を入力して送信,POST /company/departments,422が返り「部署名は100文字以内で入力してください。」が返る,layer:http,VAL-11
+PU-088-inp,inp,DepartmentStoreRequest,企業Aが存在し管理者でログイン済み,部署名に100文字を入力して送信,POST /company/departments,登録が成功する,layer:http VAL-11境界OK,VAL-11
+PU-089-inp,inp,DepartmentStoreRequest,企業A・無効化済み部署dept5@a(name=総務部)が存在する,同一部署名「総務部」を入力して送信,POST /company/departments,422が返り「この部署名は既に登録されています。」が返る,layer:http,VAL-11
+PU-090-inp,inp,DepartmentStoreRequest,企業Bに部署名「経理部」が存在し企業Aの管理者でログイン済み,企業Aで部署名「経理部」を入力して送信,POST /company/departments,企業単位一意のため登録が成功する,layer:http VAL-11 OKケース,VAL-11
+PU-091-evt,evt,DepartmentService::update,企業A・部署dept1@aが存在し管理者でログイン済み,部署名を「新部署名」に変更して送信,PUT /company/departments/{dept1},部署名が「新部署名」に更新される,layer:integration,UC-17
+PU-092-evt,evt,DepartmentService::deactivate,企業A・部署dept1@aに所属ユーザーuser1@aが存在する,部署を無効化,POST /company/departments/{dept1}/deactivate,dept1@aが無効化され以後のユーザー登録・編集の部署選択肢に表示されなくなるがuser1@aの所属表示は維持される,layer:integration,UC-18;AC-21
+PU-093-evt,evt,DepartmentService::activate,企業A・無効化済み部署dept2@aが存在する,部署を再有効化,POST /company/departments/{dept2}/activate,dept2@aが有効化され部署選択肢に再度表示される,layer:integration,UC-22
+PU-094-inp,inp,UserCsvImportRequest,企業Aが存在し管理者でログイン済み,ファイルを選択せず送信,POST /company/users/csv,422が返り「CSVファイルを選択してください。」が返る,layer:http,VAL-12
+PU-095-inp,inp,UserCsvImportRequest,企業Aが存在し管理者でログイン済み,拡張子.txtのファイルを選択して送信,POST /company/users/csv,422が返り「CSVファイル（UTF-8）の形式が正しくありません。」が返る,layer:http,VAL-12
+PU-096-inp,inp,UserCsvImportService,企業Aが存在し管理者でログイン済み,Shift_JISでエンコードされたCSVファイルを選択して送信,POST /company/users/csv,422が返り「CSVファイル（UTF-8）の形式が正しくありません。」が返る,layer:integration,VAL-12
+PU-097-inp,inp,UserCsvImportService,企業Aが存在し管理者でログイン済み,データ行0件(ヘッダーのみ)のCSVを選択して送信,POST /company/users/csv,422が返り「CSVのデータ行は1件以上1,000件以下にしてください。」が返る,layer:integration,VAL-13
+PU-098-evt,evt,UserCsvImportService,企業Aが存在し管理者でログイン済み,データ行1000件のCSVを選択して送信,POST /company/users/csv,1000件全員が登録されユーザー一覧に反映される,layer:integration VAL-13境界OK,VAL-13
+PU-099-inp,inp,UserCsvImportService,企業Aが存在し管理者でログイン済み,データ行1001件のCSVを選択して送信,POST /company/users/csv,422が返り「CSVのデータ行は1件以上1,000件以下にしてください。」が返り1件も登録されない,layer:integration VAL-13境界NG,VAL-13;AC-17
+PU-100-inp,inp,UserCsvImportService,企業Aが存在し管理者でログイン済み,ヘッダー行の列名が定義と異なるCSVを選択して送信,POST /company/users/csv,422が返り「CSVのヘッダー行が正しくありません。」が返る,layer:integration,VAL-14
+PU-101-inp,inp,UserCsvImportService,企業Aが存在し管理者でログイン済み,2行目の列数が6列(定義は7列)のCSVを選択して送信,POST /company/users/csv,エラー一覧に「2行目: 列数が正しくありません。」が表示され1件も登録されない,layer:integration,VAL-17
+PU-102-inp,inp,UserCsvImportService,企業Aが存在し管理者でログイン済み,2行目の氏名が空のCSV(他行は正常)を選択して送信,POST /company/users/csv,エラー一覧に「2行目: 氏名は必須です。」が表示され1件も登録されない,layer:integration,VAL-15;VAL-04
+PU-103-inp,inp,UserCsvImportService,企業Aが存在し管理者でログイン済み,2行目のメールが形式不正なCSV(他行は正常)を選択して送信,POST /company/users/csv,エラー一覧に「2行目: メールアドレスの形式が正しくありません。」が表示され1件も登録されない,layer:integration,VAL-15;VAL-05
+PU-104-inp,inp,UserCsvImportService,企業Aに既存ユーザーdup4@aが存在し管理者でログイン済み,2行目のメールがdup4@aと重複するCSV(他行は正常)を選択して送信,POST /company/users/csv,エラー一覧に「2行目: このメールアドレスは既に登録されています。」が表示され1件も登録されない,layer:integration,VAL-15;VAL-06;AC-16
+PU-105-inp,inp,UserCsvImportService,企業Aが存在し管理者でログイン済み,2行目の初期パスワードが7文字のCSV(他行は正常)を選択して送信,POST /company/users/csv,エラー一覧に「2行目: パスワードは8文字以上で入力してください。」が表示され1件も登録されない,layer:integration,VAL-15;VAL-07
+PU-106-inp,inp,UserCsvImportService,企業Aが存在し管理者でログイン済み,2行目の生年月日が「2020/13/40」のCSV(他行は正常)を選択して送信,POST /company/users/csv,エラー一覧に「2行目: 生年月日はYYYY-MM-DD形式の正しい日付で入力してください。」が表示され1件も登録されない,layer:integration,VAL-15;VAL-08
+PU-107-inp,inp,UserCsvImportService,企業Aが存在し管理者でログイン済み,2行目の性別が「unknown」のCSV(他行は正常)を選択して送信,POST /company/users/csv,エラー一覧に「2行目: 性別が正しくありません。」が表示され1件も登録されない,layer:integration,VAL-15;VAL-09
+PU-108-inp,inp,UserCsvImportService,企業Aの部署マスタに「人事部」のみ存在し管理者でログイン済み,2行目の部署名が「存在しない部」のCSV(他行は正常)を選択して送信,POST /company/users/csv,エラー一覧に「2行目: 部署が正しくありません。」が表示され1件も登録されない,layer:integration,VAL-15;VAL-10
+PU-109-inp,inp,UserCsvImportService,企業Aが存在し管理者でログイン済み,2行目と4行目のメールアドレスが同一のCSVを選択して送信,POST /company/users/csv,エラー一覧に「4行目: メールアドレスがファイル内で重複しています。」が表示され1件も登録されない,layer:integration,VAL-16
+PU-110-evt,evt,UserCsvImportService,企業A・部署「人事部」が存在し管理者でログイン済み,3件とも正常なCSVを選択して送信,POST /company/users/csv,3件全員がユーザー一覧に表示される,layer:integration,UC-15;AC-15
+PU-111-evt,evt,UserCsvImportService,企業Aが存在し管理者でログイン済み,5行中4行目のみメールが重複するCSVを選択して送信,POST /company/users/csv,1件も登録されず「4行目: このメールアドレスは既に登録されています。」がエラー一覧に表示される,layer:integration,UC-15a;AC-16
+PU-112-dsp,dsp,ユーザー一覧ページング,企業Aに有効・無効合わせて21名のユーザーが存在する,ユーザー一覧を取得,GET /company/users,1ページ目に20件・2ページ目に残り1件が表示される,layer:integration,AC-20
+PU-113-dsp,dsp,部署選択肢反映,企業Aの部署マスタに部署「人事部」を登録済み,ユーザー登録画面を開く,GET /company/users/create,部署選択肢に「人事部」が表示される,layer:integration,UC-16;AC-18
+PU-114-dsp,dsp,部署選択肢除外,企業Aの部署「人事部」を無効化済み,ユーザー登録画面を開く,GET /company/users/create,部署選択肢に「人事部」が表示されない,layer:integration,UC-18;AC-21
+PU-115-other,other,UserRole enum,-,3種のvalueを取得,UserRole::SuperUser->value / Admin->value / User->value,それぞれ'super_user'/'admin'/'user'が返る,layer:unit,UC-01
+PU-116-other,other,Gender enum,-,label()を呼ぶ,Gender::Male->label() / Female->label() / Other->label(),それぞれ「男性」「女性」「その他」が返る,layer:unit,VAL-09
+PU-117-other,other,Company::scopeActive,有効企業Aと無効化済み企業Bが存在する,有効企業のみ取得,Company::active()->get(),企業Aのみが返り企業Bは含まれない,layer:unit,Q-15
+PU-118-other,other,User role判定メソッド,role=super_user/admin/userの3種のユーザーが存在する,各ユーザーのロール判定メソッドを呼ぶ,isSuperUser() / isAdmin() / isUser(),roleに一致するメソッドのみtrueを返す,layer:unit,UC-01
+PU-119-other,other,パスワードハッシュ化,企業Aが存在し管理者でログイン済み,初期パスワード「pass1234」で登録,POST /company/users,DB上のpasswordが平文と異なりHash::check('pass1234', $stored)がtrueを返す,layer:integration,NFR-01
+PU-120-other,other,CSVパスワードハッシュ化,企業A・部署「人事部」が存在し管理者でログイン済み,初期パスワード「pass1234」を含むCSVを送信,POST /company/users/csv,登録されたユーザーのpasswordが平文と異なりHash::check('pass1234', $stored)がtrueを返す,layer:integration,NFR-01
+PU-121-other,other,CSRF対策,ログイン画面が表示可能な状態,CSRFトークンを付与せず送信,POST /login(_token省略),419が返り認証処理が実行されない,layer:http,NFR-04
+PU-122-other,other,既存welcomeルート回帰,ルート追加後の状態,トップページを取得,GET /,200が返り既存のwelcome画面が表示される,layer:http IMPACT-02回帰,IMPACT-02
+PU-123-other,other,DatabaseSeeder回帰,マイグレーション実行済みの空DB,シーダーを実行,php artisan db:seed,SuperUserSeederが呼ばれエラーなく完走しスーパーユーザーが1件作成される,layer:integration IMPACT-04回帰,IMPACT-04
+PU-124-other,other,UserFactory回帰,マイグレーション実行済み,デフォルト状態でfactory生成,User::factory()->create(),role等の追加必須列にデフォルト値が入りエラーなくユーザーが作成される,layer:integration IMPACT-05回帰,IMPACT-05
+PU-125-other,other,APP_LOCALE=ja回帰,.envのAPP_LOCALEがjaに設定済み,氏名を空にして送信,POST /company/users,バリデーションエラーメッセージが日本語の「氏名は必須です。」で返る,layer:http IMPACT-11回帰,IMPACT-11
+PU-126-inp,inp,UserStoreRequest,企業A・部署dept1@aが存在し管理者でログイン済み,メールに255文字ちょうどの値を入力して送信,POST /company/users,登録が成功する,layer:http VAL-05境界OK,VAL-05
+PU-127-inp,inp,AdminUpdateRequest,企業A・管理者admin1@aが存在しスーパーユーザーでログイン済み,氏名を空にして送信,PUT /company/admins/{admin1},422が返り「氏名は必須です。」が返りDBの氏名が変更前の値のまま維持される,layer:http,VAL-04
+PU-128-inp,inp,AdminUpdateRequest,企業A・管理者admin1@aが存在しスーパーユーザーでログイン済み,メールを空にして送信,PUT /company/admins/{admin1},422が返り「メールアドレスは必須です。」が返りDBのメールが変更前の値のまま維持される,layer:http,VAL-05
+PU-129-inp,inp,UserUpdateRequest,企業A・ユーザーuser1@aが存在し管理者でログイン済み,氏名を空にして送信,PUT /company/users/{user1},422が返り「氏名は必須です。」が返りDBの氏名が変更前の値のまま維持される,layer:http,VAL-04
+PU-130-inp,inp,UserUpdateRequest,企業A・ユーザーuser1@aが存在し管理者でログイン済み,メールを空にして送信,PUT /company/users/{user1},422が返り「メールアドレスは必須です。」が返りDBのメールが変更前の値のまま維持される,layer:http,VAL-05
+PU-131-inp,inp,UserUpdateRequest,企業A・ユーザーuser1@aが存在し管理者でログイン済み,生年月日を空にして送信,PUT /company/users/{user1},422が返り「生年月日は必須です。」が返りDBの生年月日が変更前の値のまま維持される,layer:http,VAL-08
+PU-132-inp,inp,UserUpdateRequest,企業A・ユーザーuser1@aが存在し管理者でログイン済み,入社年月日を空にして送信,PUT /company/users/{user1},422が返り「入社年月日は必須です。」が返りDBの入社年月日が変更前の値のまま維持される,layer:http,VAL-08
+PU-133-inp,inp,UserUpdateRequest,企業A・ユーザーuser1@aが存在し管理者でログイン済み,性別を未選択で送信,PUT /company/users/{user1},422が返り「性別は必須です。」が返りDBの性別が変更前の値のまま維持される,layer:http,VAL-09
+PU-134-inp,inp,DepartmentUpdateRequest,企業A・部署dept1@aが存在し管理者でログイン済み,部署名を空にして送信,PUT /company/departments/{dept1},422が返り「部署名は必須です。」が返りDBの部署名が変更前の値のまま維持される,layer:http,VAL-11
+PU-135-auth,auth,HTTP認可(user→company/users/csv),role=userのユーザーでログイン済み,CSVアップロード画面へ直接アクセス,GET /company/users/csv,403が返る,layer:http,AC-06;NFR-03
+PU-136-inp,inp,UserCsvImportService,企業Aが存在し管理者でログイン済み,2行目の入社年月日が「2020/13/40」のCSV(他行は正常)を選択して送信,POST /company/users/csv,エラー一覧に「2行目: 入社年月日はYYYY-MM-DD形式の正しい日付で入力してください。」が表示され1件も登録されない,layer:integration,VAL-15;VAL-08

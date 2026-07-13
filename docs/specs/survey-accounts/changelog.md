@@ -41,3 +41,15 @@
 - 内容: 02-design.md を承認。独立レビュー（sdd-design-reviewer）の機械修正 5 件
   （IMPACT-11/13・users.name 列長記述・FK onDelete 不統一・一覧ページング記載漏れ）と、
   ユーザー指摘による §1 論理削除方針の理由づけ修正（差戻し 1 回）を経て確定
+
+## 2026-07-13 (5)
+
+- フェーズ: テスト設計
+- 操作: approved
+- 内容: 03-test-plan.md・03-test-plan.csv（E2E 17 件）・03-test-plan-phpunit.csv（PHPUnit 136 件）・
+  03-test-plan-vitest.csv（該当なし）を承認。PHPUnit → Vitest → E2E 棚卸し → E2E CSV の順で設計し、
+  複合 VAL 分解表・閾値チェック一覧・要件カバレッジ表・回帰確認表を作成。独立レビュー
+  （sdd-plan-reviewer）の指摘 6 件（更新系 Update 必須項目空入力ケースの欠落・エラーメッセージ
+  文言の確定仕様との不一致・CSV 登録の role=user 403 確認欠落・出典 ID 種別不一致・CSV 行内
+  入社年月日形式不正ケースの欠落・§2 カテゴリ別件数表の実カウント不一致）はすべて機械修正で
+  解消（要判断の残課題なし）。`npm run lint:sdd -- survey-accounts` は ERROR 0 / WARN 0
