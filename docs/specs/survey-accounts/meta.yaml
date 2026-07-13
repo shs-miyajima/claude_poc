@@ -1,0 +1,25 @@
+# feature_id: TBD
+# 親スペック: docs/specs/survey-system/（全体概要・システム全体 Q&A）
+display_name: アンケートシステム アカウント基盤（認証・企業/部署/管理者/ユーザー管理）
+slug: survey-accounts
+status: draft
+created: 2026-07-13
+updated: 2026-07-13
+
+# 関連パス（実装開始後に追記）
+laravel:
+  controllers: []
+  services: []
+  models: []
+  views: []
+frontend:
+  js_files: []
+e2e:
+  spec_files: []
+vitest:
+  test_files: []
+
+# 参照元（正本は specs 内の Markdown）
+source_documents:
+  - ../survey-system/README.md（全体概要・分割構成）
+  - ../survey-system/open-questions.md（システム全体 Q&A・Q1〜Q41）

@@ -1,0 +1,26 @@
+# feature_id: TBD
+# 親スペック（全体概要・Q&A 保持）。承認ゲートなし。実体は survey-accounts / survey-create /
+# survey-answer / survey-dashboard の 4 スペック（README.md 参照）
+display_name: アンケート作成・回答・管理システム（全体・親）
+slug: survey-system
+status: parent
+created: 2026-07-13
+updated: 2026-07-13
+
+# 関連パス（親スペックのため実装なし。各分割スペックの meta.yaml を参照）
+laravel:
+  controllers: []
+  services: []
+  models: []
+  views: []
+frontend:
+  js_files: []
+e2e:
+  spec_files: []
+vitest:
+  test_files: []
+
+# 参照元（正本は specs 内の Markdown）
+source_documents:
+  - チャット入力（2026-07-13 ユーザー提示の概要・権限・機能一覧）
+  - open-questions.md（システム全体 Q&A・Q1〜Q41）
