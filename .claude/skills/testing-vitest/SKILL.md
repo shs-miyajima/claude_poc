@@ -1,14 +1,12 @@
 ---
 name: testing-vitest
 description: >-
-  Vitest による JavaScript 単体テストを実装/修正/実行する時、resources/js配下のJSロジック
-  （ユーティリティ関数・DOM操作・axiosラッパー等）にテストを書く時、SDDフェーズ3(テスト設計)で
-  03-test-plan-vitest.csvを作成する時、SDDフェーズ4(実装)でVitestテストコードを書く時に使う規約。
+  VitestでJavaScript単体テストを実装/修正/実行する時、resources/js配下の純関数テストを書く時、
+  SDDフェーズ3(テスト設計)で03-test-plan-vitest.csvを作成する時、SDDフェーズ4でVitestを書く時に使う規約。
 ---
 
-# Vitest 単体テスト規約（JavaScript）
+# Vitest 規約
 
-対象: `resources/js/**/*.js`, `resources/js/**/*.test.js`, `vitest.config.js` を扱う作業。
 返答は日本語。指定された作業範囲以外のコードは修正しない。
 
 ## 対象
@@ -27,24 +25,17 @@ description: >-
 ## 実行
 
 ```bash
-npm run test           # 全テスト
-npm run test:coverage  # カバレッジ付き（閾値未達で失敗）
-npm run test:watch     # ウォッチモード（設定時）
-npx vitest run <path>  # 個別実行
+npm run test          # 全テスト
+npm run test:watch    # ウォッチモード（設定時）
+npx vitest run <path> # 個別実行
 ```
-
-## カバレッジ基準（実装完了の条件）
-
-- **テスト対象とした JS モジュールは lines / functions / branches / statements すべて 90% 以上**
-  （閾値は `vitest.config.js` の `coverage.thresholds` で強制。未達はテスト失敗になる）
-- エントリ・DOM 配線（`app.js` / `bootstrap.js` / ページエントリ）は E2E の担当のため計測対象外
-- 閾値に到達できない行がある場合は、テストを歪めて通すのではなく、
-  理由を `03-test-plan.md` または PR に明記して許容する
 
 ## 方針
 
-- E2E（Playwright）が主。Vitest は **JS ロジックの単体テスト** に限定
-- DOM 依存のテストは jsdom 等の Vitest 環境を使用
+- レイヤ分担の正本: `.claude/skills/testing-pyramid/SKILL.md`
+- **E2E は主テストではない**。重要ジャーニーの正常系とビジネスクリティカルな異常系に限定する
+- バリデーション・境界値の **網羅** は PHPUnit / Vitest の責務。E2E の `inp` は **1 画面 1 スモーク**＋クリティカル異常のみ
+- DOM 依存のテストは jsdom 等の Vitest 環境を使用（可能なら Vitest へ）
 - Service 相当のサーバー側ロジックは PHPUnit でテスト
 - 表示ロジックは特殊表示や異常系だけでなく、通常データが正しく描画される正常系も確認する
 - API ラッパーは URL / payload の正常系と、エラーを呼び出し側へ伝播するケースを確認する
@@ -52,16 +43,17 @@ npx vitest run <path>  # 個別実行
 
 ## Test ID アノテーション規約（突合チェックに必須）
 
-各 `it(...)` / `test(...)` の直前行に、対応する CSV の Test ID をコメントする。
-この規約により `node scripts/sdd-lint-testid.mjs <slug>` でテスト実装の漏れを機械検出できる。
+各 `test(...)` / `it(...)` の直前行に、対応する CSV（`03-test-plan-vitest.csv`）の Test ID を
+以下の形式でコメントする。`npm run lint:sdd:testid -- <slug>` が計画と実装の突合に使用する。
 
 ```javascript
-// Vitest-other-001: 一覧 API URL 組み立て OK
-it('一覧取得で検索条件がクエリパラメータに付与される', async () => {
+// VT-001-dyn: formatDate — ISO 文字列を YYYY/MM/DD に変換する
+test('formatDate は ISO 文字列を YYYY/MM/DD に変換する', () => {
 ```
 
-- コメント形式: `// <Test ID>: <説明>`（Test ID は `Vitest-{category}-{nnn}` 形式）
-- 1 つの `it(...)` に対して 1 行のアノテーション
+- コメント形式: `// <Test ID>: <説明>`（Test ID は `VT-{nnn}-{カテゴリ}` 形式。例: `VT-001-dyn`。
+  カテゴリは CSV のカテゴリ列と一致させる。正本: `.claude/skills/testing-pyramid/SKILL.md`「Test ID 形式」）
+- 1 つのテストに対して 1 行のアノテーション（複数の Test ID を 1 テストに紐付けない）
 
 ## SDD 連携
 

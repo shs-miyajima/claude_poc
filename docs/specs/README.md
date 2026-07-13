@@ -26,12 +26,14 @@ docs/specs/
 
 ## フェーズと承認
 
+手順の正本は `.claude/rules/sdd-workflow.md` です。本 README と食い違う場合はルールを優先します。
+
 | フェーズ | 成果物 | 承認ファイル |
 |---------|--------|-------------|
-| 1. 仕様整理 | `01-requirements.md` | `01-requirements.status` |
+| 1. 仕様整理 | `01-requirements.md`, `open-questions.md`, `effort-report.md`（見積）, `01-requirements-review-checklist.md`（AI 独立レビュー結果） | `01-requirements.status` |
 | 2. 設計 | `02-design.md`, `02-design-review-checklist.md`（AI 独立レビュー結果） | `02-design.status` |
 | 3. テスト設計 | `03-test-plan.md`, `03-test-plan.csv`, `03-test-plan-phpunit.csv`（該当時）, `03-test-plan-vitest.csv`（該当時）, `03-test-plan-review-checklist.md`（AI 独立レビュー結果） | `03-test-plan.status` |
-| 4. 実装 | コード・テスト, `04-completion-report.md` | — |
+| 4. 実装・テスト | コード・テストコード, `04-completion-report.md` | — |
 
 `*.status` の値: `draft` | `approved` | `rejected`
 
@@ -39,23 +41,23 @@ status ファイルは 1 行目に状態、2 行目以降に `date:`（更新日
 
 各フェーズで承認（`approved`）を得てから次へ進みます。承認できるのは人間のみで、
 エージェントは直近のユーザー発言に明示的な承認がある場合に限り `approved` へ更新します。
-承認・差戻しのたびに `changelog.md` へ記録します。
+承認・差戻しのたびに `changelog.md` へ記録します。承認済みの成果物を変更する場合は
+差分承認（`draft` に戻して再承認）の手順に従います。
+
+フェーズ 1（仕様整理）・フェーズ 2（設計）・フェーズ 3（テスト設計）では、承認確認の前に読み取り専用
+サブエージェントによる **AI 独立レビュー**を行い、結果を各レビューチェックリストに残します
+（人間の承認を代替するものではありません）。
+
+各フェーズの承認直後には、成果物と `*.status`・`changelog.md` をまとめて
+git commit します（**フェーズコミット**。メッセージ形式:
+`[SDD][<slug>] フェーズN(<フェーズ名>) approved`）。
 
 テスト設計の CSV はテスト種別ごとに分けます。Playwright E2E は `03-test-plan.csv`、
 PHPUnit は `03-test-plan-phpunit.csv`、Vitest は `03-test-plan-vitest.csv` を使用し、
 異なるテスト種別のケースを同じ CSV に混在させません。
 
-設計フェーズとテスト設計フェーズは、承認確認を提示する前に**独立したレビュー用のサブエージェント**が
-それぞれ `02-design-review-checklist.md` / `03-test-plan-review-checklist.md` に沿って検証します
-（詳細: `.claude/rules/sdd-workflow.md` の各フェーズの「独立レビュー」）。設計レビューでは
-影響範囲（IMPACT）を実際のコードベース検索で裏取りします。機械的に自動修正可能な指摘は
-その場で修正し、判断が必要な指摘のみ承認確認と一緒に人間に提示します。
-この独立レビューは人間の承認を代替しません。
-
-各フェーズの承認直後とフェーズ 4 完了時には git commit を行い、チャット履歴の外に
-復元ポイントと監査証跡を残します（コミットメッセージ形式:
-`[SDD][<slug>] フェーズN(<フェーズ名>) <操作>`。詳細: `.claude/rules/sdd-workflow.md`
-「Git 運用（フェーズコミット）」）。
+**レイヤ分担**（Playwright = ジャーニー＋クリティカル異常、PHPUnit/Vitest = ロジック・境界値・異常系網羅）
+は `.claude/skills/testing-pyramid/SKILL.md` を正とします。
 
 ## 工数レポート
 

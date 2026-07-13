@@ -8,8 +8,7 @@ description: >-
 
 # Playwright E2E 規約
 
-対象: `tests/e2e_tests/**/*` を扱う作業。返答は日本語。
-指定された作業範囲以外のコードは修正しない。
+返答は日本語。指定された作業範囲以外のコードは修正しない。
 
 ## 配置
 
@@ -46,7 +45,7 @@ FEATURE=<slug> npx playwright test tests/test_<name>.spec.ts
 
 ## DB 状態（実行前の初期化）
 
-E2E テストは申請作成・ステータス更新等で DB を変更するため、実行を繰り返すとデータが蓄積する。
+E2E テストはユーザー作成・アンケート回答等で DB を変更するため、実行を繰り返すとデータが蓄積する。
 
 - **E2E 実行前に DB を初期化する**:
 
@@ -68,7 +67,7 @@ docker compose exec app php artisan migrate:fresh --seed
 ## セレクタ
 
 - E2E のセレクタは `data-testid` を優先する（CSS クラス・表示文言・DOM 構造に依存しない）
-- 実装時の `data-testid` 付与規約は `frontend-vite-tailwind` skill（`.claude/skills/frontend-vite-tailwind/SKILL.md`）を参照
+- 実装時の `data-testid` 付与規約は `.claude/skills/frontend-vite-tailwind/SKILL.md` を参照
 
 ## 並列実行安全性（`fullyParallel: true`）
 
@@ -97,8 +96,21 @@ docker compose exec app php artisan migrate:fresh --seed
 ## テスト設計
 
 - SDD フェーズ 3 の `03-test-plan.csv` がケースの正本
+- レイヤ分担: `.claude/skills/testing-pyramid/SKILL.md`
 - カテゴリ接尾辞: inp / dsp / auth / evt / trn / dyn / other
-- 正常系・異常系・境界値・権限・派生パターンを網羅
+
+### E2E に載せるカテゴリ（目安）
+
+| カテゴリ | 載せる内容 |
+|----------|-----------|
+| `trn` | ログイン後遷移等、ジャーニー正常系 |
+| `evt` | 登録・更新等の**通し正常系**。条件分岐・集計の網羅は PHPUnit へ |
+| `auth` | 未ログイン遷移・ログイン失敗の画面挙動のみ（HTTP 認可網羅は載せない） |
+| `dsp` | ジャーニー上必須の一覧・確認画面・グラフ**描画**。データ計算は Vitest / PHPUnit へ |
+| `inp` | **最小限** — **1 画面 1 スモーク** ＋ クリティカル異常。項目ごとの inp 量産禁止 | 境界値・形式の網羅は載せない |
+| `dyn` | Vitest で足りない DOM 操作のみ（原則 Vitest へ） |
+
+境界値・形式チェック・複合 VAL の理由別網羅は `03-test-plan-phpunit.csv` / `03-test-plan-vitest.csv` に書く。
 
 ## Test ID アノテーション規約（突合チェックに必須）
 
@@ -106,11 +118,12 @@ docker compose exec app php artisan migrate:fresh --seed
 この規約により `node scripts/sdd-lint-testid.mjs <slug>` でテスト実装の漏れを機械検出できる。
 
 ```typescript
-// E2E-trn-001: 対象画面 初期表示
-test('対象画面が表示され、Seeder 初期データが一覧に表示される', async ({ page }) => {
+// E2E-001-trn: ログイン画面が表示される
+test('ログイン画面が表示される', async ({ page }) => {
 ```
 
-- コメント形式: `// <Test ID>: <説明>`（Test ID は `E2E-{category}-{nnn}` 形式）
+- コメント形式: `// <Test ID>: <説明>`（Test ID は `E2E-{nnn}-{カテゴリ}` 形式。例: `E2E-001-trn`。
+  カテゴリは CSV のカテゴリ列と一致させる。正本: `.claude/skills/testing-pyramid/SKILL.md`「Test ID 形式」）
 - 1 つの `test(...)` に対して 1 行のアノテーション（複数の Test ID を 1 テストに紐付けない）
 - `describe` ブロック内のテストにも同様に付ける
 

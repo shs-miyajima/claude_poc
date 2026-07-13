@@ -9,9 +9,7 @@ description: >-
 
 # Laravel 規約
 
-対象: `app/**/*.php`, `routes/**/*.php`, `database/**/*.php`, `config/**/*.php`,
-`tests/**/*.php`, `bootstrap/**/*.php` を扱う作業。返答は日本語。
-指定された作業範囲以外のコードは修正しない。
+返答は日本語。指定された作業範囲以外のコードは修正しない。
 
 ## 環境
 
@@ -41,54 +39,11 @@ description: >-
 | `tests/Unit/` | 単体テスト |
 | `tests/Feature/` | 機能テスト |
 
-## インデックス設計（SDD フェーズ 2・Migration 作成時）
-
-「重くなってから張る」のではなく、**要件に根拠があるものを初期 Migration で張り切る**。
-逆に、根拠を specs の ID（UC-xx / VAL-xx / §5.2 画面項目 / FK）で言えないインデックスは
-張らない（推測での先行最適化をしない。フェーズ 1 の「仮定の禁止」と同じ判断基準）。
-
-| 種類 | 判断 | 根拠の書き方 |
-|------|------|-------------|
-| FK カラム | **必ず張る**（PostgreSQL は FK に自動でインデックスを張らない） | FK |
-| 業務上の一意制約 | **必ず unique index で張る**（アプリ側バリデーションだけに頼らない） | VAL-xx |
-| 画面の検索・絞り込み・並び順カラム | 張る | UC-xx / §5.2 の項目名 |
-| 単独の低カーディナリティ列（status・フラグ等） | 原則張らない。複合インデックスの一部か部分インデックス（`WHERE status = '...'`）を検討 | 設計判断の理由を明記 |
-| 「将来使うかも」 | 張らない | 根拠 ID が書けない = 推測 |
-
-- 複合インデックスの列順は「**等値条件（=）で絞る列が先、範囲条件（<, BETWEEN）・ORDER BY の列が後**」。
-  カーディナリティは同格の候補が並んだときのタイブレークに使う二次基準
-  （カーディナリティ順を機械的に適用しない）
-- 設計時は `02-design.md` §2.4 のインデックス表に「テーブル・対象列（列順どおり）・種類・根拠 ID」を記載する
-
-## クエリ設計（一覧・参照系）
-
-- 一覧・参照系はリレーション参照を設計時に洗い出し、Eager Loading（`with()`）の対象を
-  `02-design.md` §2.2 のメソッド概要に明記する（N+1 クエリの予防。「重くなってから直す」にしない）
-- 一覧画面は原則 `paginate()` を使う。全件表示にする場合は上限件数と根拠を設計に書く
-
-## 削除設計
-
-- テーブルごとに**論理削除か物理削除か**を設計時に決め、`02-design.md` §2.4 の表に記載する
-- FK は削除時挙動（`cascadeOnDelete` / `restrictOnDelete` / `nullOnDelete`）を明示する
-  （デフォルト任せ・暗黙の restrict にしない）
-- 論理削除を選ぶ場合、unique 制約との干渉（削除済みレコードと同値の再登録可否）を設計で確認する
-
 ## テスト
 
-- PHPUnit は **Service 等の単体テストに限定**
-- E2E は Playwright が主。Controller の E2E 代替テストは原則書かない
-
-### カバレッジ基準（実装完了の条件）
-
-- **Service・Enum 等の PHPUnit 担当範囲は原則 100%**（到達できない行は理由を
-  `03-test-plan.md` または PR に明記して許容する）
-- **プロジェクト全体では 80% 以上**（`--min=80` で強制。未達はテスト失敗になる）
-- Controller・Blade 等の未カバーは E2E（Playwright）の担当のため、PHPUnit で
-  重複してテストしない
-
-```bash
-docker compose exec -e XDEBUG_MODE=coverage app php artisan test --coverage --min=80
-```
+- レイヤ分担の正本: `.claude/skills/testing-pyramid/SKILL.md`
+- PHPUnit: Service 単体・結合・FormRequest・**HTTP Feature（422 / 認可）**
+- E2E（Playwright）: ジャーニー正常系と**画面固有**のクリティカル異常に限定。認可の HTTP 網羅は PHPUnit へ
 
 ## コマンド
 
@@ -101,21 +56,6 @@ docker compose exec app php artisan migrate
 docker compose exec app php artisan test
 docker compose exec app vendor/bin/phpunit --filter <TestClass>
 ```
-
-## Test ID アノテーション規約（突合チェックに必須）
-
-各テストメソッドの直前の docコメントに、対応する CSV の Test ID を記載する。
-この規約により `node scripts/sdd-lint-testid.mjs <slug>` でテスト実装の漏れを機械検出できる。
-
-```php
-/**
- * PHPUnit-inp-001: 任意項目 空入力で登録成功
- */
-public function test_任意項目が空でも登録できる(): void
-```
-
-- docコメント形式: `* <Test ID>: <説明>`（Test ID は `PHPUnit-{category}-{nnn}` 形式）
-- 1 つのテストメソッドに対して 1 行のアノテーション
 
 ## SDD 連携
 

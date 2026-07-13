@@ -26,7 +26,7 @@ globs:
 cd tests/e2e_tests
 # エビデンス（test-results / playwright-report）を機能単位のフォルダに出力するため
 # FEATURE に docs/specs の slug を指定して実行する（未指定時は all フォルダ）
-$env:FEATURE = '001_create_management'; npx playwright test tests/test_<name>.spec.ts
+$env:FEATURE = 'survey-system'; npx playwright test tests/test_<name>.spec.ts
 ```
 
 - Laravel 標準認証のため **並列実行可**（`playwright.config.ts` の `workers` は環境に応じて設定）
@@ -37,7 +37,7 @@ $env:FEATURE = '001_create_management'; npx playwright test tests/test_<name>.sp
 
 ## DB 状態（実行前の初期化）
 
-E2E テストは申請作成・ステータス更新等で DB を変更するため、実行を繰り返すとデータが蓄積する。
+E2E テストはユーザー作成・アンケート回答等で DB を変更するため、実行を繰り返すとデータが蓄積する。
 
 - **E2E 実行前に DB を初期化する**:
 
@@ -88,8 +88,21 @@ docker compose exec app php artisan migrate:fresh --seed
 ## テスト設計
 
 - SDD フェーズ 3 の `03-test-plan.csv` がケースの正本
+- レイヤ分担: `.cursor/rules/testing-pyramid.mdc`
 - カテゴリ接尾辞: inp / dsp / auth / evt / trn / dyn / other
-- 正常系・異常系・境界値・権限・派生パターンを網羅
+
+### E2E に載せるカテゴリ（目安）
+
+| カテゴリ | 載せる内容 |
+|----------|-----------|
+| `trn` | ログイン後遷移等、ジャーニー正常系 |
+| `evt` | 登録・更新等の**通し正常系**。条件分岐・集計の網羅は PHPUnit へ |
+| `auth` | 未ログイン遷移・ログイン失敗の画面挙動のみ（HTTP 認可網羅は載せない） |
+| `dsp` | ジャーニー上必須の一覧・確認画面・グラフ**描画**。データ計算は Vitest / PHPUnit へ |
+| `inp` | **最小限** — **1 画面 1 スモーク** ＋ クリティカル異常。項目ごとの inp 量産禁止 | 境界値・形式の網羅は載せない |
+| `dyn` | Vitest で足りない DOM 操作のみ（原則 Vitest へ） |
+
+境界値・形式チェック・複合 VAL の理由別網羅は `03-test-plan-phpunit.csv` / `03-test-plan-vitest.csv` に書く。
 
 ## Test ID アノテーション規約（突合チェックに必須）
 
@@ -97,11 +110,11 @@ docker compose exec app php artisan migrate:fresh --seed
 この規約により `node scripts/sdd-lint-testid.mjs <slug>` でテスト実装の漏れを機械検出できる。
 
 ```typescript
-// E2E-trn-001: /equipment-loans 初期表示
-test('備品貸出管理画面が表示され初期ユーザーは最初の一般社員', async ({ page }) => {
+// E2E-001: ログイン画面が表示される
+test('ログイン画面が表示される', async ({ page }) => {
 ```
 
-- コメント形式: `// <Test ID>: <説明>`（Test ID は `E2E-{category}-{nnn}` 形式）
+- コメント形式: `// <Test ID>: <説明>`（Test ID は `E2E-{nnn}` 形式）
 - 1 つの `test(...)` に対して 1 行のアノテーション（複数の Test ID を 1 テストに紐付けない）
 - `describe` ブロック内のテストにも同様に付ける
 

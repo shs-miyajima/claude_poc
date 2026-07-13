@@ -1,4 +1,4 @@
-# Cursor_Poc — エージェント向けガイド
+# claude_poc — エージェント向けガイド
 
 ## プロジェクト概要
 
@@ -26,9 +26,9 @@ Laravel 12 管理画面。仕様駆動開発（SDD）で機能を追加する。
 | DB | PostgreSQL 18（Docker） |
 | フロント | Blade + Vite + axios + JavaScript + Tailwind CSS |
 | 認証 | Laravel 標準（session / Breeze 等）※Breeze は今後追加 |
-| 単体（サーバー） | PHPUnit（Service 等に限定） |
-| 単体（フロント） | Vitest（JavaScript） |
-| E2E | Playwright（TypeScript） |
+| 単体（サーバー） | PHPUnit（Service 単体・結合） |
+| 単体（フロント） | Vitest（JavaScript 純関数） |
+| E2E | Playwright（TypeScript）— ジャーニー正常系＋クリティカル異常 |
 
 ## Docker 構成（既存 LLax27 方式）
 
@@ -78,18 +78,29 @@ docker compose exec app php artisan test
 | `.claude/settings.json` | チーム共有設定（テスト・ビルド・lint コマンドの許可リスト） |
 | `.claude/rules/sdd-workflow.md` | SDD フェーズ・承認ゲート（常時適用） |
 | `.claude/rules/windows-file-editing-safety.md` | Windows でのファイル編集時の文字化け事故防止（常時適用） |
-| `.claude/agents/sdd-design-reviewer.md` | 設計の独立レビュー用サブエージェント（読み取り専用・コードベース裏取り） |
-| `.claude/agents/sdd-plan-reviewer.md` | テスト計画の独立レビュー用サブエージェント（読み取り専用） |
+| `.claude/agents/sdd-requirements-reviewer.md` | フェーズ 1（仕様整理）の独立レビュー用サブエージェント（読み取り専用） |
+| `.claude/agents/sdd-design-reviewer.md` | フェーズ 2（設計）の独立レビュー用サブエージェント（読み取り専用・コードベース裏取り） |
+| `.claude/agents/sdd-plan-reviewer.md` | フェーズ 3（テスト計画）の独立レビュー用サブエージェント（読み取り専用） |
 | `.claude/skills/sdd-bootstrap/SKILL.md` | プロジェクト立ち上げ |
 | `.claude/skills/sdd-feature/SKILL.md` | 機能追加 |
 | `.claude/skills/laravel-conventions/SKILL.md` | Laravel 規約（実装・設計時に参照） |
 | `.claude/skills/frontend-vite-tailwind/SKILL.md` | フロント規約（実装・設計時に参照） |
+| `.claude/skills/testing-pyramid/SKILL.md` | テストピラミッド（レイヤ分担）の正本 |
 | `.claude/skills/testing-playwright/SKILL.md` | Playwright E2E 規約（テスト設計・実装時に参照） |
+| `.claude/skills/testing-phpunit/SKILL.md` | PHPUnit 規約（テスト設計・実装時に参照） |
 | `.claude/skills/testing-vitest/SKILL.md` | Vitest 規約（テスト設計・実装時に参照） |
 | `.claude/commands/sdd-new.md` | `/sdd-new <slug>` — 新機能の開始（テンプレート配置〜フェーズ 1） |
 | `.claude/commands/sdd-status.md` | `/sdd-status` — 全機能の SDD 進捗一覧 |
 
 ## テスト
+
+テストピラミッドの正本: `.claude/skills/testing-pyramid/SKILL.md`
+
+| レイヤ | コマンド |
+|--------|----------|
+| PHPUnit（単体・結合） | `docker compose exec app php artisan test` |
+| Vitest（JS 単体） | `npm run test` |
+| Playwright（ジャーニー・クリティカル異常） | `cd tests/e2e_tests && npx playwright test` |
 
 ```bat
 docker compose exec app php artisan test     # PHPUnit

@@ -1,7 +1,7 @@
 ---
 name: sdd-bootstrap
 description: >-
-  Cursor_Poc プロジェクトの立ち上げ。Docker（laravel_app tar）+ Laravel 12 + Vite/Tailwind、
+  claude_poc プロジェクトの立ち上げ。Docker（laravel_app tar）+ Laravel 12 + Vite/Tailwind、
   docs/specs、Playwright、Vitest。プロジェクト立ち上げ・bootstrap と言及されたときに使用する。
 ---
 
@@ -9,7 +9,7 @@ description: >-
 
 ## 前提
 
-- リポジトリ: Cursor_Poc（Laravel + SDD 同一リポジトリ）
+- リポジトリ: claude_poc（Laravel + SDD 同一リポジトリ）
 - Docker: `laravel_app:1.0`（`latest_images/laravel_app_1.0.tar`）
 - DB: PostgreSQL 18（Docker）
 - フロント: Blade + Vite + axios + JavaScript + Tailwind CSS
