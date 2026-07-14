@@ -1,1 +1,87 @@
 Test ID,カテゴリ,対象(項目/機能),前提条件,入力/操作,手順,期待結果,備考,出典
+PU-001-inp,inp,SurveyStoreRequest(タイトル),アンケート作成画面が表示可能な状態,タイトルを空欄のまま送信,POST /company/surveysにtitle=空欄・他項目は有効値,422が返り「タイトルを入力してください」が返る,layer:http target:POST /company/surveys,VAL-01
+PU-002-inp,inp,SurveyStoreRequest(タイトル),アンケート作成画面が表示可能な状態,タイトルに501文字を入力して送信,POST /company/surveysにtitle=501文字,422が返り「タイトルは500文字以内で入力してください」が返る,layer:http,VAL-02
+PU-003-inp,inp,SurveyStoreRequest(タイトル・境界OK),アンケート作成画面が表示可能な状態,タイトルに500文字を入力して送信,POST /company/surveysにtitle=500文字,登録が成功しアンケートが下書き状態で保存される,layer:http VAL-02境界OK,VAL-02
+PU-004-inp,inp,SurveyStoreRequest(開始日),アンケート作成画面が表示可能な状態,回答期間の開始日を空欄のまま送信,POST /company/surveysにanswer_start_date=空欄,422が返り「回答期間(開始日・終了日)を入力してください」が返る,layer:http VAL-03サブルール(開始日),VAL-03
+PU-005-inp,inp,SurveyStoreRequest(終了日),アンケート作成画面が表示可能な状態,回答期間の終了日を空欄のまま送信,POST /company/surveysにanswer_end_date=空欄,422が返り「回答期間(開始日・終了日)を入力してください」が返る,layer:http VAL-03サブルール(終了日),VAL-03
+PU-006-inp,inp,SurveyStoreRequest(期間の前後関係),アンケート作成画面が表示可能な状態,終了日に開始日より前の日付を入力して送信,POST /company/surveysにanswer_start_date=2026-08-01・answer_end_date=2026-07-31,422が返り「回答終了日は開始日以降の日付を入力してください」が返る,layer:http,VAL-04
+PU-007-inp,inp,SurveyStoreRequest(期間・境界OK),アンケート作成画面が表示可能な状態,開始日と終了日に同一日付を入力して送信,POST /company/surveysにanswer_start_date=2026-08-01・answer_end_date=2026-08-01,登録が成功する,layer:http VAL-04境界OK(同日),VAL-04
+PU-008-inp,inp,SurveyStoreRequest(記名/匿名),アンケート作成画面が表示可能な状態,記名/匿名を未選択のまま送信,POST /company/surveysにanswer_visibility=空欄,422が返り「記名または匿名を選択してください」が返る,layer:http,VAL-05
+PU-009-inp,inp,SurveyStoreRequest(設問文),アンケート作成画面が表示可能な状態,設問文を空欄のまま送信,POST /company/surveysにquestions.0.body=空欄,422が返り「設問文を入力してください」が返る,layer:http,VAL-06
+PU-010-inp,inp,SurveyStoreRequest(設問文),アンケート作成画面が表示可能な状態,設問文に501文字を入力して送信,POST /company/surveysにquestions.0.body=501文字,422が返り「設問文は500文字以内で入力してください」が返る,layer:http,VAL-07
+PU-011-inp,inp,SurveyStoreRequest(設問文・境界OK),アンケート作成画面が表示可能な状態,設問文に500文字を入力して送信,POST /company/surveysにquestions.0.body=500文字,登録が成功する,layer:http VAL-07境界OK,VAL-07
+PU-012-inp,inp,SurveyStoreRequest(設問数上限),アンケート作成画面が表示可能な状態,設問を101件送信,POST /company/surveysにquestions配列101件,422が返り「設問は100件まで登録できます」が返る,layer:http,VAL-08
+PU-013-inp,inp,SurveyStoreRequest(設問数・境界OK),アンケート作成画面が表示可能な状態,設問を100件送信,POST /company/surveysにquestions配列100件,登録が成功する,layer:http VAL-08境界OK,VAL-08
+PU-014-inp,inp,SurveyStoreRequest(選択肢上限・単一選択),アンケート作成画面が表示可能な状態,単一選択設問に選択肢を11件送信,POST /company/surveysにquestion_type=single_choice・choices配列11件,422が返り「選択肢は10件まで登録できます」が返る,layer:http withValidator VAL-09サブルール(単一選択),VAL-09
+PU-015-inp,inp,SurveyStoreRequest(選択肢上限・複数選択),アンケート作成画面が表示可能な状態,複数選択設問に選択肢を11件送信,POST /company/surveysにquestion_type=multiple_choice・choices配列11件,422が返り「選択肢は10件まで登録できます」が返る,layer:http withValidator VAL-09サブルール(複数選択),VAL-09
+PU-016-inp,inp,SurveyStoreRequest(選択肢上限・境界OK),アンケート作成画面が表示可能な状態,単一選択設問に選択肢を10件送信,POST /company/surveysにquestion_type=single_choice・choices配列10件,登録が成功する,layer:http VAL-09境界OK,VAL-09
+PU-017-inp,inp,SurveyStoreRequest(選択肢下限・単一選択),アンケート作成画面が表示可能な状態,単一選択設問に選択肢を1件のみ送信,POST /company/surveysにquestion_type=single_choice・choices配列1件,422が返り「選択肢は2件以上登録してください」が返る,layer:http withValidator VAL-10サブルール(単一選択),VAL-10
+PU-018-inp,inp,SurveyStoreRequest(選択肢下限・複数選択),アンケート作成画面が表示可能な状態,複数選択設問に選択肢を1件のみ送信,POST /company/surveysにquestion_type=multiple_choice・choices配列1件,422が返り「選択肢は2件以上登録してください」が返る,layer:http withValidator VAL-10サブルール(複数選択),VAL-10
+PU-019-inp,inp,SurveyStoreRequest(選択肢下限・境界OK),アンケート作成画面が表示可能な状態,単一選択設問に選択肢を2件送信,POST /company/surveysにquestion_type=single_choice・choices配列2件,登録が成功する,layer:http VAL-10境界OK,VAL-10
+PU-020-inp,inp,SurveyStoreRequest(選択肢文言),アンケート作成画面が表示可能な状態,選択肢文言に501文字を入力して送信,POST /company/surveysにquestions.0.choices.0.body=501文字,422が返り「選択肢は500文字以内で入力してください」が返る,layer:http,VAL-11
+PU-021-inp,inp,SurveyStoreRequest(選択肢文言・境界OK),アンケート作成画面が表示可能な状態,選択肢文言に500文字を入力して送信,POST /company/surveysにquestions.0.choices.0.body=500文字,登録が成功する,layer:http VAL-11境界OK,VAL-11
+PU-022-inp,inp,SurveyStoreRequest(段階評価1側ラベル),アンケート作成画面が表示可能な状態,段階評価設問の1側ラベルに501文字を入力して送信,POST /company/surveysにquestion_type=scale・scale_min_label=501文字,422が返り「ラベルは500文字以内で入力してください」が返る,layer:http VAL-13サブルール(1側),VAL-13
+PU-023-inp,inp,SurveyStoreRequest(段階評価5側ラベル),アンケート作成画面が表示可能な状態,段階評価設問の5側ラベルに501文字を入力して送信,POST /company/surveysにquestion_type=scale・scale_max_label=501文字,422が返り「ラベルは500文字以内で入力してください」が返る,layer:http VAL-13サブルール(5側),VAL-13
+PU-024-inp,inp,SurveyStoreRequest(段階評価ラベル・境界OK),アンケート作成画面が表示可能な状態,段階評価設問の両端ラベルに500文字を入力して送信,POST /company/surveysにscale_min_label=500文字・scale_max_label=500文字,登録が成功する,layer:http VAL-13境界OK,VAL-13
+PU-025-evt,evt,段階評価ラベル未入力,アンケート作成画面が表示可能な状態,段階評価設問の両端ラベルを未入力のまま送信,POST /company/surveysにquestion_type=scale・scale_min_label=null・scale_max_label=null,登録が成功しDBのscale_min_label・scale_max_labelがnullで保存される,layer:integration open-questions#2,AC-13
+PU-026-inp,inp,SurveyStoreRequest(設問形式),アンケート作成画面が表示可能な状態,設問形式を未選択のまま送信,POST /company/surveysにquestions.0.question_type=空欄,422が返り「設問形式を選択してください」が返る,layer:http,VAL-16
+PU-027-inp,inp,SurveyStoreRequest(選択肢文言未入力・単一選択),アンケート作成画面が表示可能な状態,単一選択設問の選択肢の1件を空欄のまま送信,POST /company/surveysにquestion_type=single_choice・questions.0.choices.1.body=空欄,422が返り「選択肢を入力してください」が返る,layer:http withValidator VAL-17サブルール(単一選択),VAL-17
+PU-028-inp,inp,SurveyStoreRequest(選択肢文言未入力・複数選択),アンケート作成画面が表示可能な状態,複数選択設問の選択肢の1件を空欄のまま送信,POST /company/surveysにquestion_type=multiple_choice・questions.0.choices.1.body=空欄,422が返り「選択肢を入力してください」が返る,layer:http withValidator VAL-17サブルール(複数選択),VAL-17
+PU-029-inp,inp,SurveyUpdateRequest(タイトル空欄),下書きのアンケートAが存在し管理者でログイン済み,更新時にタイトルを空欄にして送信,PUT /company/surveys/{surveyA}にtitle=空欄,422が返り「タイトルを入力してください」が返りDBのタイトルが変更前の値のまま維持される,layer:http 更新系必須項目,VAL-01
+PU-030-inp,inp,SurveyUpdateRequest(開始日空欄),下書きのアンケートAが存在し管理者でログイン済み,更新時に開始日を空欄にして送信,PUT /company/surveys/{surveyA}にanswer_start_date=空欄,422が返り「回答期間(開始日・終了日)を入力してください」が返りDBの開始日が変更前の値のまま維持される,layer:http 更新系必須項目,VAL-03
+PU-031-inp,inp,SurveyUpdateRequest(終了日空欄),下書きのアンケートAが存在し管理者でログイン済み,更新時に終了日を空欄にして送信,PUT /company/surveys/{surveyA}にanswer_end_date=空欄,422が返り「回答期間(開始日・終了日)を入力してください」が返りDBの終了日が変更前の値のまま維持される,layer:http 更新系必須項目,VAL-03
+PU-032-inp,inp,SurveyUpdateRequest(記名/匿名空欄),下書きのアンケートAが存在し管理者でログイン済み,更新時に記名/匿名を未選択にして送信,PUT /company/surveys/{surveyA}にanswer_visibility=空欄,422が返り「記名または匿名を選択してください」が返りDBの記名/匿名が変更前の値のまま維持される,layer:http 更新系必須項目,VAL-05
+PU-033-inp,inp,SurveyUpdateRequest(設問文空欄),下書きのアンケートAが存在し管理者でログイン済み,更新時に設問文を空欄にして送信,PUT /company/surveys/{surveyA}にquestions.0.body=空欄,422が返り「設問文を入力してください」が返りDBの設問構成が変更前のまま維持される,layer:http 更新系必須項目,VAL-06
+PU-034-inp,inp,SurveyUpdateRequest(設問形式空欄),下書きのアンケートAが存在し管理者でログイン済み,更新時に設問形式を未選択にして送信,PUT /company/surveys/{surveyA}にquestions.0.question_type=空欄,422が返り「設問形式を選択してください」が返りDBの設問構成が変更前のまま維持される,layer:http 更新系必須項目,VAL-16
+PU-035-inp,inp,SurveyUpdateRequest(選択肢文言空欄),下書きのアンケートAが存在し管理者でログイン済み,更新時に単一選択設問の選択肢の1件を空欄にして送信,PUT /company/surveys/{surveyA}にquestions.0.choices.1.body=空欄,422が返り「選択肢を入力してください」が返りDBの選択肢が変更前のまま維持される,layer:http 更新系必須項目,VAL-17
+PU-036-evt,evt,SurveyUpdateRequest(段階評価ラベル空値上書き),段階評価ラベルを設定済みの下書きアンケートAが存在し管理者でログイン済み,更新時に段階評価の両端ラベルを空欄にして送信,PUT /company/surveys/{surveyA}にscale_min_label=空欄・scale_max_label=空欄,更新が成功しDBのscale_min_label・scale_max_labelがnullで上書き保存される,layer:integration 更新系任意項目(空値上書き),AC-13
+PU-037-evt,evt,SurveyService::create(基本),管理者でログイン済み,タイトル・回答期間・記名/匿名を入力して保存,POST /company/surveys,アンケートがstatus=draftで保存され一覧に表示される,layer:integration,UC-01;AC-01
+PU-038-evt,evt,SurveyService::create(単一選択設問),管理者でログイン済み,単一選択設問と選択肢3件を追加して保存,POST /company/surveysにquestion_type=single_choice・choices3件,設問と選択肢3件がDBに保存され詳細画面に表示される,layer:integration,UC-06;UC-10;AC-02
+PU-039-evt,evt,SurveyService::create(複数選択設問),管理者でログイン済み,複数選択設問と選択肢3件を追加して保存,POST /company/surveysにquestion_type=multiple_choice・choices3件,設問と選択肢3件がDBに保存され詳細画面に表示される,layer:integration,UC-06;UC-10;AC-02
+PU-040-evt,evt,SurveyService::create(自由記述設問),管理者でログイン済み,自由記述設問を追加して保存,POST /company/surveysにquestion_type=free_text,設問がDBに保存され詳細画面に表示される,layer:integration,UC-06;AC-02
+PU-041-evt,evt,SurveyService::create(段階評価設問),管理者でログイン済み,段階評価設問を追加して保存,POST /company/surveysにquestion_type=scale,設問がDBに保存され詳細画面に表示される,layer:integration,UC-06;UC-11;AC-02
+PU-042-other,other,SurveyService::syncQuestions(choices無視),管理者でログイン済み,自由記述設問にchoices配列を付けて送信,POST /company/surveysにquestion_type=free_text・choices配列あり,choicesがDBに保存されない(0件),layer:unit 設計§2.2の分岐確認,UC-06
+PU-043-other,other,SurveyService::syncQuestions(sort_order・設問),管理者でログイン済み,設問を3件の配列順で送信,POST /company/surveysにquestions配列3件,DBのsort_orderが配列インデックス順(0・1・2)で保存される,layer:integration,UC-09
+PU-044-other,other,SurveyService::syncQuestions(sort_order・選択肢),管理者でログイン済み,選択肢を3件の配列順で送信,POST /company/surveysにchoices配列3件,DBのsort_orderが配列インデックス順(0・1・2)で保存される,layer:integration,UC-09
+PU-045-other,other,SurveyService::syncQuestions(is_required初期値),管理者でログイン済み,設問のis_requiredを指定せずに送信,POST /company/surveysにquestions.0.is_required未指定,DBのis_requiredがfalse(任意)で保存される,layer:integration open-questions#3,UC-06
+PU-046-other,other,SurveyService::syncQuestions(is_required明示),管理者でログイン済み,設問のis_requiredをtrueにして送信,POST /company/surveysにquestions.0.is_required=true,DBのis_requiredがtrueで保存される,layer:integration,UC-07
+PU-047-evt,evt,SurveyService::update(全置換),既存設問2件・選択肢を持つ下書きアンケートAが存在し管理者でログイン済み,新しい設問1件を送信して更新,PUT /company/surveys/{surveyA}にquestions配列1件(既存と異なる内容),更新後のDBに新しい設問1件のみが存在し既存の2件は削除される,layer:integration,UC-02;UC-07;UC-08;UC-09;UC-10
+PU-048-other,other,SurveyService::delete(カスケード削除),設問2件・選択肢を持つ下書きアンケートAが存在し管理者でログイン済み,アンケートAを削除,DELETE /company/surveys/{surveyA},questionsテーブル・choicesテーブルからもAに紐づく行が削除される,layer:integration,UC-03;AC-03
+PU-049-evt,evt,SurveyService::publish,下書きのアンケートAが存在し管理者でログイン済み,アンケートAを公開,POST /company/surveys/{surveyA}/publish,DBのstatusがpublishedに変わり一覧の状態表示が「公開」になる,layer:integration,UC-04;AC-04
+PU-050-evt,evt,アンケート一覧(自社スコープ),企業Aに2件・企業Bに1件のアンケートが存在し企業Aの管理者でログイン済み,アンケート一覧を取得,GET /company/surveys,一覧に企業Aの2件のみ表示され企業Bの1件は含まれない,layer:integration,NFR-02;UC-05
+PU-051-dsp,dsp,アンケート一覧(並び順),企業Aに3件のアンケートを異なる時刻に作成し管理者でログイン済み,アンケート一覧を取得,GET /company/surveys,直近作成したアンケートが1行目に表示される(orderByDesc(id)),layer:integration,UC-05
+PU-052-dsp,dsp,アンケート一覧(ページング),企業Aに21件のアンケートが存在し管理者でログイン済み,アンケート一覧の2ページ目を取得,GET /company/surveys?page=2,2ページ目に残り1件のアンケートが表示される,layer:integration,UC-05
+PU-053-dsp,dsp,アンケート詳細(設問構成表示),単一選択設問・選択肢3件を持つ下書きアンケートAが存在し管理者でログイン済み,アンケート詳細を取得,GET /company/surveys/{surveyA},設問文・形式・選択肢3件・必須/任意が保存済み内容どおり表示される,layer:http,UC-13;AC-02
+PU-054-dsp,dsp,アンケート詳細(段階評価ラベルなし),段階評価設問(両端ラベル未設定)を持つアンケートAが存在し管理者でログイン済み,アンケート詳細を取得,GET /company/surveys/{surveyA},ラベルが表示されず数値1〜5のみ表示される,layer:http,AC-13
+PU-055-dsp,dsp,アンケート詳細(段階評価ラベルあり),段階評価設問(1側「全くそう思わない」・5側「とてもそう思う」)を持つアンケートAが存在し管理者でログイン済み,アンケート詳細を取得,GET /company/surveys/{surveyA},1側に「全くそう思わない」・5側に「とてもそう思う」が表示される,layer:http,AC-14
+PU-056-dsp,dsp,アンケート一覧・詳細(作成者非表示),スーパーユーザーが個別企業画面切替で代理作成したアンケートAが存在し管理者でログイン済み,アンケート一覧・詳細を取得,GET /company/surveys・GET /company/surveys/{surveyA},作成者を特定できる情報(氏名・メール等)が一覧・詳細のレスポンスに含まれない,layer:http open-questions#7,UC-12;AC-16
+PU-057-dsp,dsp,アンケート一覧・詳細(回答数非表示),アンケートAが存在し管理者でログイン済み,アンケート一覧・詳細を取得,GET /company/surveys・GET /company/surveys/{surveyA},回答数・回答率がレスポンスに含まれない,layer:http open-questions#11,UC-13
+PU-058-evt,evt,タイトル重複許容,「2026年度 従業員満足度調査」というタイトルのアンケートが既に存在し管理者でログイン済み,同じタイトルで新しいアンケートを作成,POST /company/surveysにtitle=「2026年度 従業員満足度調査」,登録が成功しエラーにならず一覧に2件とも表示される,layer:integration open-questions#9,AC-15
+PU-059-dsp,dsp,下書きのみ編集/削除/公開導線表示,下書きのアンケートAと公開済みのアンケートBが存在し管理者でログイン済み,アンケートA・Bの詳細を取得,GET /company/surveys/{surveyA}・GET /company/surveys/{surveyB},Aの詳細には編集・削除・公開ボタンが表示されBの詳細には表示されない,layer:http,AC-04
+PU-060-other,other,SurveyStatus::label(),アンケート作成・編集ロジックの実装が完了している,Draft・Publishedそれぞれのlabel()を呼び出す,SurveyStatus::Draft->label()・SurveyStatus::Published->label(),「下書き」「公開」がそれぞれ返る,layer:unit,AC-04
+PU-061-other,other,AnswerVisibility::label(),アンケート作成・編集ロジックの実装が完了している,Named・Anonymousそれぞれのlabel()を呼び出す,AnswerVisibility::Named->label()・AnswerVisibility::Anonymous->label(),「記名」「匿名」がそれぞれ返る,layer:unit,VAL-05
+PU-062-other,other,QuestionType::label(),アンケート作成・編集ロジックの実装が完了している,4種類のlabel()を呼び出す,QuestionType::SingleChoice/MultipleChoice/FreeText/Scale->label(),「単一選択」「複数選択」「自由記述」「段階評価」がそれぞれ返る,layer:unit,VAL-16
+PU-063-other,other,Question::hasChoices(),単一選択・複数選択・自由記述・段階評価の設問がそれぞれ存在する,各設問のhasChoices()を呼び出す,$question->hasChoices(),単一選択・複数選択はtrue・自由記述・段階評価はfalseを返す,layer:unit,UC-10
+PU-064-other,other,Question::ANSWER_MAX_LENGTH,アンケート作成・編集ロジックの実装が完了している,定数を参照する,Question::ANSWER_MAX_LENGTH,2000が返る,layer:unit,VAL-12
+PU-065-other,other,Company::surveys(),企業Aにアンケートが2件存在する,Companyモデルからsurveys()を呼び出す,$company->surveys,企業Aの2件のSurveyコレクションが返る,layer:unit,UC-05
+PU-066-auth,auth,自社アンケートへの操作(OKケース),下書きのアンケートAが存在し管理者(企業A)でログイン済み,詳細・編集にアクセス,GET /company/surveys/{surveyA}・GET /company/surveys/{surveyA}/edit,いずれも200が返り403にならない,layer:http VAL-15正常系,VAL-15
+PU-067-auth,auth,HTTP認可(他社アンケート詳細),企業Aの管理者でログイン済み・企業Bのアンケートbが存在する,他社アンケートの詳細URLへ直接アクセス,GET /company/surveys/{surveyB},403が返る,layer:http,VAL-15;AC-08
+PU-068-auth,auth,HTTP認可(他社アンケート編集画面),企業Aの管理者でログイン済み・企業Bのアンケートbが存在する,他社アンケートの編集URLへ直接アクセス,GET /company/surveys/{surveyB}/edit,403が返る,layer:http,VAL-15
+PU-069-auth,auth,HTTP認可(他社アンケート更新),企業Aの管理者でログイン済み・企業Bのアンケートbが存在する,他社アンケートの更新に直接アクセス,PUT /company/surveys/{surveyB},403が返る,layer:http,VAL-15
+PU-070-auth,auth,HTTP認可(他社アンケート削除),企業Aの管理者でログイン済み・企業Bのアンケートbが存在する,他社アンケートの削除に直接アクセス,DELETE /company/surveys/{surveyB},403が返る,layer:http,VAL-15
+PU-071-auth,auth,HTTP認可(他社アンケート公開),企業Aの管理者でログイン済み・企業Bのアンケートbが存在する,他社アンケートの公開に直接アクセス,POST /company/surveys/{surveyB}/publish,403が返る,layer:http,VAL-15
+PU-072-auth,auth,HTTP認可(公開済み編集画面),公開済みのアンケートAが存在し管理者(企業A)でログイン済み,公開済みアンケートの編集URLへ直接アクセス,GET /company/surveys/{surveyA}/edit,403が返る,layer:http,VAL-14;AC-05
+PU-073-auth,auth,HTTP認可(公開済み更新),公開済みのアンケートAが存在し管理者(企業A)でログイン済み,公開済みアンケートの更新に直接アクセス,PUT /company/surveys/{surveyA},403が返る,layer:http,VAL-14
+PU-074-auth,auth,HTTP認可(公開済み削除),公開済みのアンケートAが存在し管理者(企業A)でログイン済み,公開済みアンケートの削除に直接アクセス,DELETE /company/surveys/{surveyA},403が返る,layer:http,VAL-14
+PU-075-auth,auth,HTTP認可(公開済み再公開),公開済みのアンケートAが存在し管理者(企業A)でログイン済み,公開済みアンケートの公開操作に再度直接アクセス,POST /company/surveys/{surveyA}/publish,403が返る,layer:http 二重公開防止,VAL-14
+PU-076-auth,auth,HTTP認可(公開済み詳細閲覧OK),公開済みのアンケートAが存在し管理者(企業A)でログイン済み,公開済みアンケートの詳細URLへアクセス,GET /company/surveys/{surveyA},200が返り閲覧できる,layer:http VAL-14適用外,UC-13
+PU-077-auth,auth,HTTP認可(userロール),role=userのユーザーでログイン済み,アンケート一覧URLへ直接アクセス,GET /company/surveys,403が返る,layer:http,NFR-03
+PU-078-auth,auth,HTTP認可(super_user未切替),個別企業画面へ未切替のスーパーユーザーでログイン済み,アンケート一覧URLへ直接アクセス,GET /company/surveys,403が返る,layer:http,AC-07;NFR-03
+PU-079-auth,auth,代理作成(SU切替済み)の操作許可,個別企業画面へ切替済みのスーパーユーザーセッションがある,アンケートを新規作成する,POST /company/surveysにtitle・回答期間・記名/匿名・questions.0を入力,アンケートが管理者と同様に作成されstatus=draftで保存される,layer:http update/delete/publishはSetCompanyContextにより管理者操作時と同一コードパスのためPU-047/048/049で代替確認済み,UC-12;AC-06
+PU-080-other,other,回帰確認(既存ルート),企業Aの管理者でログイン済み,アンケート機能追加後に既存のユーザー管理画面へアクセス,GET /company/users,200が返り既存機能に影響がない,layer:http,IMPACT-01
+PU-081-other,other,回帰確認(ナビ表示),企業Aの管理者でログイン済み,企業ホーム画面を取得,GET /company/home,既存のdata-testid(nav-users等)のリンクがアンケート機能追加後も表示される,layer:http,IMPACT-02
+PU-082-other,other,回帰確認(JS変更後の他画面表示),企業Aの管理者でログイン済み,アンケート機能追加後にユーザー管理画面を取得,GET /company/users,200が返り既存画面の表示に影響がない,layer:http,IMPACT-04
+PU-083-other,other,回帰確認(validation属性追記),企業Aの管理者でログイン済み,既存の部署登録画面で部署名を空欄にして送信,POST /company/departmentsにdepartment_name=空欄,従来どおり「部署名は必須です。」相当の422エラーが返る,layer:http,IMPACT-09
+PU-084-inp,inp,SurveyStoreRequest(選択肢上限・複数選択・境界OK),アンケート作成画面が表示可能な状態,複数選択設問に選択肢を10件送信,POST /company/surveysにquestion_type=multiple_choice・choices配列10件,登録が成功する,layer:http VAL-09境界OK(複数選択),VAL-09
+PU-085-inp,inp,SurveyStoreRequest(選択肢下限・複数選択・境界OK),アンケート作成画面が表示可能な状態,複数選択設問に選択肢を2件送信,POST /company/surveysにquestion_type=multiple_choice・choices配列2件,登録が成功する,layer:http VAL-10境界OK(複数選択),VAL-10
+PU-086-other,other,回帰確認(ホーム画面メニュー表示),企業Aの管理者でログイン済み,企業ホーム画面を取得,GET /company/home,既存の「ユーザー管理」「部署マスタ管理」「ユーザーCSV一括登録」リンクがアンケート機能追加後も表示される,layer:http,IMPACT-11
