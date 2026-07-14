@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Company\AdminController;
 use App\Http\Controllers\Company\DepartmentController;
 use App\Http\Controllers\Company\HomeController as CompanyHomeController;
+use App\Http\Controllers\Company\SurveyController;
 use App\Http\Controllers\Company\UserController;
 use App\Http\Controllers\Company\UserCsvController;
 use App\Http\Controllers\Super\CompanyController;
@@ -59,6 +60,15 @@ Route::middleware(['auth', 'active', 'role:super_user,admin', 'ctx'])
         Route::put('departments/{department}', [DepartmentController::class, 'update'])->name('departments.update');
         Route::post('departments/{department}/deactivate', [DepartmentController::class, 'deactivate'])->name('departments.deactivate');
         Route::post('departments/{department}/activate', [DepartmentController::class, 'activate'])->name('departments.activate');
+
+        Route::get('surveys', [SurveyController::class, 'index'])->name('surveys.index');
+        Route::get('surveys/create', [SurveyController::class, 'create'])->name('surveys.create');
+        Route::post('surveys', [SurveyController::class, 'store'])->name('surveys.store');
+        Route::get('surveys/{survey}', [SurveyController::class, 'show'])->name('surveys.show');
+        Route::get('surveys/{survey}/edit', [SurveyController::class, 'edit'])->name('surveys.edit');
+        Route::put('surveys/{survey}', [SurveyController::class, 'update'])->name('surveys.update');
+        Route::delete('surveys/{survey}', [SurveyController::class, 'destroy'])->name('surveys.destroy');
+        Route::post('surveys/{survey}/publish', [SurveyController::class, 'publish'])->name('surveys.publish');
     });
 
 Route::middleware(['auth', 'active', 'role:super_user', 'ctx'])

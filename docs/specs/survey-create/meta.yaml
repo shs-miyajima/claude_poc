@@ -2,22 +2,58 @@
 # 親スペック: docs/specs/survey-system/（全体概要・システム全体 Q&A）
 display_name: アンケート作成（設問作成・編集・削除・下書き/公開・代理作成）
 slug: survey-create
-status: draft
+status: implemented
 created: 2026-07-14
 updated: 2026-07-14
 
 # 関連パス（実装開始後に追記）
 laravel:
-  controllers: []
-  services: []
-  models: []
-  views: []
+  controllers:
+    - app/Http/Controllers/Company/SurveyController.php
+  services:
+    - app/Services/SurveyService.php
+  models:
+    - app/Models/Survey.php
+    - app/Models/Question.php
+    - app/Models/Choice.php
+    - app/Enums/SurveyStatus.php
+    - app/Enums/AnswerVisibility.php
+    - app/Enums/QuestionType.php
+  requests:
+    - app/Http/Requests/SurveyStoreRequest.php
+    - app/Http/Requests/SurveyUpdateRequest.php
+    - app/Http/Requests/Concerns/SurveyRequestRules.php
+  migrations:
+    - database/migrations/2026_07_14_000001_create_surveys_table.php
+    - database/migrations/2026_07_14_000002_create_questions_table.php
+    - database/migrations/2026_07_14_000003_create_choices_table.php
+  factories:
+    - database/factories/SurveyFactory.php
+    - database/factories/QuestionFactory.php
+    - database/factories/ChoiceFactory.php
+  views:
+    - resources/views/company/surveys/index.blade.php
+    - resources/views/company/surveys/create.blade.php
+    - resources/views/company/surveys/edit.blade.php
+    - resources/views/company/surveys/show.blade.php
+    - resources/views/company/surveys/_form.blade.php
+    - resources/views/company/surveys/_question.blade.php
+    - resources/views/company/surveys/_choice.blade.php
+  tests:
+    - tests/Feature/Http/SurveyValidationTest.php
+    - tests/Feature/Services/SurveyServiceTest.php
+    - tests/Unit/Models/SurveyModelEnumTest.php
+    - tests/Feature/Http/SurveyAuthorizationTest.php
+    - tests/Feature/RegressionTest.php（追記）
 frontend:
-  js_files: []
+  js_files:
+    - resources/js/surveyForm.js
 e2e:
-  spec_files: []
+  spec_files:
+    - tests/e2e_tests/tests/test_survey.spec.ts
 vitest:
-  test_files: []
+  test_files:
+    - resources/js/surveyForm.test.js
 
 # 参照元（正本は specs 内の Markdown）
 source_documents:

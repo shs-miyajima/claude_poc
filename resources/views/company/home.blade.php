@@ -12,6 +12,7 @@
         <li><a href="{{ route('company.users.index') }}">ユーザー管理</a></li>
         <li><a href="{{ route('company.departments.index') }}">部署マスタ管理</a></li>
         <li><a href="{{ route('company.users.csv') }}">ユーザーCSV一括登録</a></li>
+        <li><a href="{{ route('company.surveys.index') }}" data-testid="home-surveys">アンケート管理</a></li>
     </ul>
 </div>
 @endsection

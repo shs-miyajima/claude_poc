@@ -69,3 +69,17 @@
   さらに承認確認の場で差戻しがあった「選択肢2件時の削除ボタン挙動」について、02-design.mdを差分承認
   （フェーズ2再承認、JS側でdisabledにする方針）した上でVitest（VT-012〜014）を追加し、再度承認確認を
   提示して承認された。lint:sdd（ERROR 0 / WARN 0）を確認済み
+
+## 2026-07-14 (8)
+
+- フェーズ: 実装・テスト
+- 操作: 完了
+- 内容: Migration 3件・Enum 3件・Model 3件・Factory 3件・FormRequest 2件（共通ルールは
+  Concerns\SurveyRequestRulesトレイトに集約）・SurveyService・SurveyController・ルート8件・Blade 4画面
+  ＋部分ビュー3件・surveyForm.js・既存画面への導線追加を実装。PHPUnit 86件・Vitest 14件・
+  Playwright E2E 7件を計画どおり実装し全件成功（既存分を含む全体でもPHPUnit 224件・Vitest 15件で
+  回帰なし）。実装検証中に、設問の並び替え時にラジオボタン（question_type・is_required）の選択状態が
+  ブラウザの同名ラジオ排他制御により意図せず解除される不具合を検出し、renumber()を衝突しない
+  一時プレフィックス経由の2段階振り直し方式に修正して解消（Vitest VT-003/004に再発防止の検証を追加）。
+  npm run lint:sdd:testid -- survey-createでERROR 0件を確認。04-completion-report.md・effort-report.md
+  （フェーズ4実績記録）を作成

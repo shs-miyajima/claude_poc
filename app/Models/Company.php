@@ -34,6 +34,11 @@ class Company extends Model
         return $this->hasMany(User::class);
     }
 
+    public function surveys(): HasMany
+    {
+        return $this->hasMany(Survey::class);
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->whereNull('deactivated_at');

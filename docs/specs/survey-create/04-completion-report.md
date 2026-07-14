@@ -1,55 +1,65 @@
-# 実装完了報告 — {{display_name}}
+# 実装完了報告 — アンケート作成（設問作成・編集・削除・下書き/公開・代理作成）
 
-> **フェーズ 4 完了時に作成する。** `.claude/rules/sdd-workflow.md` の「実装完了の基準」を
+> フェーズ 4 完了時に作成する。`.claude/rules/sdd-workflow.md` の「実装完了の基準」を
 > 満たしたことの証拠を記録し、完了報告に含める。
 > 承認ゲートの対象外（status ファイルなし）。
 
 ## 1. 実装サマリ
 
-<!-- 実装内容の要約を 1〜3 文で。成果物ファイルの一覧は meta.yaml の関連パスを正とする -->
+`02-design.md` の設計どおり、アンケート（`surveys`/`questions`/`choices` の新設 3 テーブル、
+`SurveyStatus`/`AnswerVisibility`/`QuestionType` の 3 Enum、`Survey`/`Question`/`Choice` モデル、
+`SurveyService`（全置換方式の作成・更新・削除・公開）、`SurveyController`（一覧・作成・詳細・編集・更新・
+削除・公開の 8 アクション）、`SurveyStoreRequest`/`SurveyUpdateRequest`（共通ルールは
+`Concerns\SurveyRequestRules` トレイトに集約）を実装した。フロントは一覧/作成/編集/詳細の Blade 4 画面と
+`_form`/`_question`/`_choice` 部分ビュー、設問・選択肢の動的追加/削除/並び替え・設問形式による表示切替を
+行う `resources/js/surveyForm.js` を新規作成し、`layouts/app.blade.php` のナビと `company/home.blade.php`
+のメニューに導線を追加した。
 
 ## 2. テスト実行結果
 
 | 種別 | 計画ケース数 | 実装ケース数 | 実行結果 | 実行日 |
 |------|-------------|-------------|---------|--------|
-| PHPUnit | <○ 件> | <○ 件> | <全件成功 / 失敗 ○ 件 / 未実行> | <YYYY-MM-DD> |
-| Vitest | <○ 件> | <○ 件> | <全件成功 / 失敗 ○ 件 / 未実行> | <YYYY-MM-DD> |
-| Playwright E2E | <○ 件> | <○ 件> | <全件成功 / 失敗 ○ 件 / 未実行> | <YYYY-MM-DD> |
+| PHPUnit | 86 | 86 | 全件成功 | 2026-07-14 |
+| Vitest | 14 | 14 | 全件成功 | 2026-07-14 |
+| Playwright E2E | 7 | 7 | 全件成功 | 2026-07-14 |
 
-<!-- 計画ケース数は 03-test-plan の各 CSV の行数。実装と計画に差がある場合は §4 に理由を書く -->
+既存テスト（PHPUnit 138 件・Vitest 1 件）を含めた全体でも回帰なし
+（PHPUnit 合計 224 件成功、Vitest 合計 15 件成功）。
 
 ## 3. Test ID 突合（計画 CSV ↔ テストコード）
 
-<!-- 各 CSV の全 Test ID がテストコードに実装されていることを確認する。差分があれば列挙する -->
+`npm run lint:sdd:testid -- survey-create` で確認。
 
 | CSV | 計画 Test ID 数 | 実装済み | 未実装（理由） |
 |-----|----------------|---------|----------------|
-| 03-test-plan.csv | | | |
-| 03-test-plan-phpunit.csv（該当時） | | | |
-| 03-test-plan-vitest.csv（該当時） | | | |
+| 03-test-plan.csv | 7 | 7 | なし |
+| 03-test-plan-phpunit.csv | 86 | 86 | なし |
+| 03-test-plan-vitest.csv | 14 | 14 | なし |
+
+ERROR 0 件（WARN 143 件はすべて他機能スペック〔survey-accounts 等〕の Test ID との
+接頭辞重複によるもので、survey-create 自体の未実装はなし）。
 
 ## 4. 基準未達・未実行項目
 
-<!--
-実装を見送ったテストケース、環境制約による E2E 未実行等。なければ「なし」。
-E2E が環境制約（`.claude/skills/testing-playwright/SKILL.md`「注意」）で実行不能な場合は、
-「未実行・理由・環境解決後に実行する」旨をここに明記する。実行できたことにしない。
--->
-
 | 対象 | 基準 | 実績 | 理由・今後の対応 |
 |------|------|------|------------------|
-| | | | |
+| なし | — | — | 全レイヤの計画ケースを実装し全件成功。基準未達・未実行項目はなし |
 
 ## 5. エビデンス
 
 | 項目 | パス / 値 |
 |------|-----------|
-| PHPUnit 実行ログ | |
-| Vitest 実行ログ | |
-| Playwright レポート・trace | `tests/e2e_tests/test-results/` 等 |
+| PHPUnit 実行ログ | `docker compose exec app php artisan test`（全体 224 件成功、うち本機能 86 件） |
+| Vitest 実行ログ | `npm run test`（全体 15 件成功、うち本機能 14 件） |
+| Playwright レポート・trace | `tests/e2e_tests/test-results/survey-create/`（全 7 件成功） |
+| Test ID 突合ログ | `npm run lint:sdd:testid -- survey-create`（ERROR 0 件） |
 
 ## 6. 残課題・申し送り
 
-<!-- 今後の対応が必要な事項、既知の制約。なければ「なし」 -->
-
-- 
+- E2E-003（編集ジャーニーの並び替え）の実装検証中に、設問ブロックを並び替える際
+  `name` 属性を単純に振り直すと、同じ `name` を一時的に共有するラジオボタン（`question_type`・
+  `is_required`）がブラウザの「同名ラジオは 1 つしか選択できない」仕様により意図せず選択解除される
+  不具合を検出した。`resources/js/surveyForm.js` の `renumber()` を、一旦衝突しない一時プレフィックス
+  （`tmp`）に振り替えてから最終インデックスへ振り直す 2 段階方式に修正して解消した
+  （Vitest の VT-003/VT-004 にラジオの選択状態が並び替え後も保持されることの検証を追加済み）
+- 上記以外の残課題なし

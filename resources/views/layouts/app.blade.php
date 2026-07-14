@@ -22,6 +22,7 @@
                     <a href="{{ route('company.users.index') }}" data-testid="nav-users">ユーザー一覧</a>
                     <a href="{{ route('company.departments.index') }}" data-testid="nav-departments">部署一覧</a>
                     <a href="{{ route('company.users.csv') }}" data-testid="nav-users-csv">CSV一括登録</a>
+                    <a href="{{ route('company.surveys.index') }}" data-testid="nav-surveys">アンケート一覧</a>
                     @if (auth()->user()->isSuperUser())
                         <form method="POST" action="{{ route('super.switch.exit') }}">
                             @csrf
