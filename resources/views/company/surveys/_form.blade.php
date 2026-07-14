@@ -15,19 +15,19 @@
 
     <div class="mb-3">
         <label class="block text-sm mb-1">タイトル</label>
-        <input type="text" name="title" value="{{ $titleValue }}" data-testid="survey-title-input" class="border rounded w-full px-2 py-1">
+        <input type="text" name="title" value="{{ $titleValue }}" data-testid="survey-title-input" class="border rounded w-full px-2 py-1 @error('title') border-red-600 @enderror">
         @error('title')<div class="text-red-600 text-sm" data-testid="title-error">{{ $message }}</div>@enderror
     </div>
 
     <div class="mb-3 flex gap-4">
         <div>
             <label class="block text-sm mb-1">回答期間（開始日）</label>
-            <input type="date" name="answer_start_date" value="{{ $startDateValue }}" data-testid="survey-start-date-input" class="border rounded px-2 py-1">
+            <input type="date" name="answer_start_date" value="{{ $startDateValue }}" data-testid="survey-start-date-input" class="border rounded px-2 py-1 @error('answer_start_date') border-red-600 @enderror">
             @error('answer_start_date')<div class="text-red-600 text-sm" data-testid="answer-start-date-error">{{ $message }}</div>@enderror
         </div>
         <div>
             <label class="block text-sm mb-1">回答期間（終了日）</label>
-            <input type="date" name="answer_end_date" value="{{ $endDateValue }}" data-testid="survey-end-date-input" class="border rounded px-2 py-1">
+            <input type="date" name="answer_end_date" value="{{ $endDateValue }}" data-testid="survey-end-date-input" class="border rounded px-2 py-1 @error('answer_end_date') border-red-600 @enderror">
             @error('answer_end_date')<div class="text-red-600 text-sm" data-testid="answer-end-date-error">{{ $message }}</div>@enderror
         </div>
     </div>

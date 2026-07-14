@@ -115,3 +115,14 @@
 - フェーズ: テスト設計
 - 操作: approved
 - 内容: VT-015-dyn追加後の03-test-plan.md・03-test-plan-vitest.csvを再承認
+
+## 2026-07-14 (13)
+
+- フェーズ: 実装・テスト
+- 操作: 完了（更新）
+- 内容: ユーザーレビュー指摘2件に対応。①設問形式ラジオボタンの初期値を単一選択に変更
+  （_question.blade.php・surveyForm.jsのaddQuestionBlockで新規ブロックの選択肢表示/削除ボタン
+  無効化状態を初期化）。②タイトル・回答期間・記名/匿名に加え、設問文・設問形式・選択肢文言・
+  段階評価ラベルの入力欄にもバリデーションエラー時の赤枠表示とメッセージ表示を追加
+  （_form.blade.php・_question.blade.php・_choice.blade.php）。PHPUnit 224件・Vitest 16件・
+  Playwright E2E 7件で全件成功を再確認。04-completion-report.md・effort-report.mdを更新

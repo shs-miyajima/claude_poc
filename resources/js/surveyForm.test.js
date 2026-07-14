@@ -41,7 +41,7 @@ function questionBlockHtml({ index, type = '', required = false, choices = null 
 }
 
 function questionTemplateHtml() {
-  return `<template data-testid="question-template">${questionBlockHtml({ index: 'NEW', type: '', choices: ['', ''] })}</template>`;
+  return `<template data-testid="question-template">${questionBlockHtml({ index: 'NEW', type: 'single_choice', choices: ['', ''] })}</template>`;
 }
 
 function choiceTemplateHtml() {
@@ -232,5 +232,16 @@ describe('surveyForm', () => {
     removeButtons.forEach((button) => {
       expect(button.disabled).toBe(false);
     });
+  });
+
+  // VT-015-dyn: 設問追加時の初期値(単一選択) — 「設問を追加」で追加した設問ブロックは単一選択があらかじめ選択され選択肢入力欄が表示される
+  it('設問を追加ボタンで追加した設問ブロックは単一選択があらかじめ選択された状態になる', () => {
+    buildForm([]);
+
+    document.querySelector('[data-testid="question-add"]').click();
+
+    const block = document.querySelector('[data-testid="question-block"]');
+    expect(block.querySelector('[data-testid="question-type-single_choice"]').checked).toBe(true);
+    expect(block.querySelector('[data-testid="choices-section"]').hidden).toBe(false);
   });
 });

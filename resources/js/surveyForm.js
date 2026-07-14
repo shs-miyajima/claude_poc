@@ -71,6 +71,13 @@ function addQuestionBlock(formRoot) {
 
   container.appendChild(template.content.cloneNode(true));
   renumber(formRoot);
+
+  const addedBlock = container.querySelectorAll(QUESTION_BLOCK_SELECTOR);
+  const newBlock = addedBlock[addedBlock.length - 1];
+  if (newBlock) {
+    updateQuestionTypeVisibility(newBlock);
+    updateChoiceRemoveDisabled(newBlock);
+  }
 }
 
 function addChoiceBlock(formRoot, questionBlock) {
