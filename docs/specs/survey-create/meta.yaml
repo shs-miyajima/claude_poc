@@ -1,0 +1,26 @@
+# feature_id: TBD
+# 親スペック: docs/specs/survey-system/（全体概要・システム全体 Q&A）
+display_name: アンケート作成（設問作成・編集・削除・下書き/公開・代理作成）
+slug: survey-create
+status: draft
+created: 2026-07-14
+updated: 2026-07-14
+
+# 関連パス（実装開始後に追記）
+laravel:
+  controllers: []
+  services: []
+  models: []
+  views: []
+frontend:
+  js_files: []
+e2e:
+  spec_files: []
+vitest:
+  test_files: []
+
+# 参照元（正本は specs 内の Markdown）
+source_documents:
+  - ../survey-system/README.md（全体概要・分割構成）
+  - ../survey-system/open-questions.md（システム全体 Q&A・Q1〜Q41。特に Q13〜Q19, Q22, Q30, Q33〜Q35, Q39, Q40 が本機能に直結）
+  - ../survey-accounts/（先行スペック。企業/部署/管理者/ユーザー・画面切替の実装済み基盤を前提とする）
