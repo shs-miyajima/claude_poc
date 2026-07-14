@@ -101,3 +101,17 @@
 - フェーズ: 仕様整理
 - 操作: approved
 - 内容: §5.2「設問形式」初期値を「単一選択」に修正した01-requirements.mdを再承認
+
+## 2026-07-14 (11)
+
+- フェーズ: テスト設計
+- 操作: reopened
+- 内容: 01-requirements.mdの設問形式初期値変更（差分承認）に伴い、03-test-plan.statusをdraftに戻す。
+  03-test-plan-vitest.csvにVT-015-dyn（設問追加時の初期値〔単一選択〕・選択肢入力欄の表示確認）を
+  追加し、03-test-plan.mdの件数集計（Vitest 14→15件・全体 107→108件）を更新して再度承認確認を提示する
+
+## 2026-07-14 (12)
+
+- フェーズ: テスト設計
+- 操作: approved
+- 内容: VT-015-dyn追加後の03-test-plan.md・03-test-plan-vitest.csvを再承認
