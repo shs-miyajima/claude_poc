@@ -1,5 +1,7 @@
 @php
-    $choiceBody = $choice->body ?? '';
+    /** $choice は null（<template> 用）または連想配列（body） */
+    $choice = $choice ?? [];
+    $choiceBody = $choice['body'] ?? '';
     $choiceBodyErrorKey = "questions.$qIndex.choices.$cIndex.body";
 @endphp
 <div class="choice-block flex items-start gap-2 mb-1" data-testid="choice-block">

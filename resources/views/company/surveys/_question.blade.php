@@ -1,11 +1,17 @@
 @php
-    /** @var \App\Models\Question|null $question */
-    $bodyValue = $question->body ?? '';
-    $selectedType = $question?->question_type?->value ?? 'single_choice';
-    $isRequired = $question->is_required ?? false;
-    $scaleMinLabel = $question->scale_min_label ?? '';
-    $scaleMaxLabel = $question->scale_max_label ?? '';
-    $choices = $question->choices ?? collect();
+    /**
+     * $question は以下のいずれか:
+     * - null（<template> 用の空データ）
+     * - 連想配列（body/question_type/is_required/scale_min_label/scale_max_label/choices）
+     *   _form.blade.php で old('questions') または DB の Question から正規化済み
+     */
+    $question = $question ?? [];
+    $bodyValue = $question['body'] ?? '';
+    $selectedType = $question['question_type'] ?? 'single_choice';
+    $isRequired = ! empty($question['is_required']);
+    $scaleMinLabel = $question['scale_min_label'] ?? '';
+    $scaleMaxLabel = $question['scale_max_label'] ?? '';
+    $choices = $question['choices'] ?? [];
     $showChoices = in_array($selectedType, ['single_choice', 'multiple_choice'], true);
     $showScale = $selectedType === 'scale';
     $bodyErrorKey = "questions.$qIndex.body";

@@ -736,4 +736,45 @@ class SurveyValidationTest extends TestCase
             'scale_max_label' => null,
         ]);
     }
+
+    /**
+     * 作成画面でバリデーションエラーが発生した場合、設問・選択肢の入力内容が保持され、
+     * 個々の欄にエラーメッセージが表示される（フォーム全体が初期化されて終わらないことの回帰確認）
+     */
+    public function test_create_validation_failure_preserves_question_input_and_shows_field_errors(): void
+    {
+        $company = Company::factory()->create();
+        $this->actingAdminInCompany($company);
+
+        $this->from('/company/surveys/create')->post('/company/surveys', $this->validSurveyPayload([
+            'questions' => [$this->choiceQuestion('single_choice', ['選択肢A', ''])],
+        ]));
+
+        $response = $this->get('/company/surveys/create');
+
+        $response->assertSee('選択肢A', false);
+        $response->assertSee('data-testid="choice-body-error"', false);
+        $response->assertSee('選択肢を入力してください');
+    }
+
+    /**
+     * 編集画面でバリデーションエラーが発生した場合、送信した設問文の内容が保持され、
+     * 該当欄にエラーメッセージが表示される（DB の元データに戻って初期化されないことの回帰確認）
+     */
+    public function test_update_validation_failure_preserves_question_input_and_shows_field_errors(): void
+    {
+        $company = Company::factory()->create();
+        $this->actingAdminInCompany($company);
+        $fixture = $this->createDraftSurveyWithSingleChoiceQuestion($company);
+
+        $this->from("/company/surveys/{$fixture['survey']->id}/edit")->put("/company/surveys/{$fixture['survey']->id}", $this->validSurveyPayload([
+            'questions' => [$this->choiceQuestion('single_choice', ['選択肢1', '選択肢2'], ['body' => ''])],
+        ]));
+
+        $response = $this->get("/company/surveys/{$fixture['survey']->id}/edit");
+
+        $response->assertSee('data-testid="question-body-error"', false);
+        $response->assertSee('設問文を入力してください');
+        $response->assertDontSee('維持される設問文');
+    }
 }

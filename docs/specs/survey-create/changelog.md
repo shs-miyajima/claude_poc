@@ -126,3 +126,16 @@
   段階評価ラベルの入力欄にもバリデーションエラー時の赤枠表示とメッセージ表示を追加
   （_form.blade.php・_question.blade.php・_choice.blade.php）。PHPUnit 224件・Vitest 16件・
   Playwright E2E 7件で全件成功を再確認。04-completion-report.md・effort-report.mdを更新
+
+## 2026-07-14 (14)
+
+- フェーズ: 実装・テスト
+- 操作: 完了（更新）
+- 内容: ユーザーから「設問の入力不足時、フォームが初期化されるだけでどこが不足しているか
+  分からない」との指摘。原因は_form.blade.phpがバリデーション失敗後の再表示時にold('questions')を
+  参照せずDBの$survey->questions（作成時は空）のみを描画していたため、入力済みの設問・選択肢が
+  消えていたこと。_form.blade.phpでold('questions')を優先復元し、_question.blade.php・
+  _choice.blade.phpをEloquentモデル/old()配列どちらも扱える連想配列ベースに統一して解消。
+  仕様変更を伴わない実装漏れの補完のため差分承認は不要と判断。回帰確認としてPHPUnitに
+  設問・選択肢の入力保持とエラー表示を確認するテストを2件追加（計画外）。
+  PHPUnit 226件・Vitest 16件・Playwright E2E 7件で全件成功を確認

@@ -5,7 +5,32 @@
     $startDateValue = old('answer_start_date', $survey?->answer_start_date?->format('Y-m-d') ?? '');
     $endDateValue = old('answer_end_date', $survey?->answer_end_date?->format('Y-m-d') ?? '');
     $visibilityValue = old('answer_visibility', $survey?->answer_visibility?->value ?? '');
-    $questions = $survey->questions ?? collect();
+
+    $oldQuestions = old('questions');
+
+    if ($oldQuestions !== null) {
+        // バリデーション失敗後の再表示: 送信内容（不正な入力を含む）をそのまま復元し、
+        // 個々の設問・選択肢のエラー表示と組み合わせて見せる。
+        $questions = collect($oldQuestions)->map(fn ($q) => [
+            'body' => $q['body'] ?? '',
+            'question_type' => $q['question_type'] ?? '',
+            'is_required' => ! empty($q['is_required']),
+            'scale_min_label' => $q['scale_min_label'] ?? '',
+            'scale_max_label' => $q['scale_max_label'] ?? '',
+            'choices' => collect($q['choices'] ?? [])->map(fn ($c) => ['body' => $c['body'] ?? ''])->values()->all(),
+        ])->values();
+    } elseif ($isEdit) {
+        $questions = $survey->questions->map(fn ($question) => [
+            'body' => $question->body,
+            'question_type' => $question->question_type->value,
+            'is_required' => $question->is_required,
+            'scale_min_label' => $question->scale_min_label ?? '',
+            'scale_max_label' => $question->scale_max_label ?? '',
+            'choices' => $question->choices->map(fn ($choice) => ['body' => $choice->body])->values()->all(),
+        ]);
+    } else {
+        $questions = collect();
+    }
 @endphp
 <form method="POST" action="{{ $isEdit ? route('company.surveys.update', $survey) : route('company.surveys.store') }}" data-survey-form>
     @csrf
