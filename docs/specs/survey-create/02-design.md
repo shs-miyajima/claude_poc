@@ -172,7 +172,7 @@
 | `resources/views/company/surveys/create.blade.php` | 新規 | `@include('company.surveys._form')` を空データで描画 |
 | `resources/views/company/surveys/edit.blade.php` | 新規 | `@include('company.surveys._form', ['survey' => $survey])` を既存データで描画 |
 | `resources/views/company/surveys/show.blade.php` | 新規 | 詳細（設問一覧・選択肢・必須/任意・段階評価ラベルの読み取り専用表示。下書き時のみ編集/削除/公開ボタン） |
-| `resources/views/company/surveys/_form.blade.php` | 新規 | アンケート本体項目 + 設問リピーター（`<template>` タグによる複製 + 「設問を追加」「削除」「↑」「↓」ボタン）+ 単一選択/複数選択時の選択肢リピーター（同様の追加・削除ボタン、下限 2 件は画面上「削除」ボタンを無効化するのではなく送信時にサーバー側 VAL-10 で弾く運用〔要件どおりの表示・保存不可の切り分け〕） |
+| `resources/views/company/surveys/_form.blade.php` | 新規 | アンケート本体項目 + 設問リピーター（`<template>` タグによる複製 + 「設問を追加」「削除」「↑」「↓」ボタン）+ 単一選択/複数選択時の選択肢リピーター（同様の追加・削除ボタン、選択肢が 2 件のときは JS 側で「削除」ボタンを無効化し 1 件まで減らせないようにする。サーバー側 VAL-10 は不正なリクエスト（無効化を回避した直接送信等）に対する保険として維持する） |
 | `resources/views/layouts/app.blade.php` | 変更 | ナビに「アンケート一覧」リンク（`data-testid="nav-surveys"`）を追加 |
 | `resources/views/company/home.blade.php` | 変更 | 要件 §5.1「アンケート一覧の遷移元 = 企業ホーム画面のメニュー」に対応するため、既存の `管理者管理` / `ユーザー管理` / `部署マスタ管理` 等のメニュー項目と同じ形式で `<li><a href="{{ route('company.surveys.index') }}" data-testid="home-surveys">アンケート管理</a></li>` 相当のリンクを追加する |
 
@@ -180,7 +180,7 @@
 
 | ファイル | 新規/変更 | 概要 |
 |---------|----------|------|
-| `resources/js/surveyForm.js` | 新規 | `data-survey-form` 要素が存在する画面でのみ初期化。設問ブロックの追加（`<template>` 複製）・削除（`confirm()` 確認後に DOM 除去）・上下移動（DOM ノード入れ替え）、単一選択/複数選択設問内の選択肢の追加・削除、設問形式（ラジオボタン）変更に応じた選択肢入力欄・段階評価ラベル入力欄の表示切替。いずれの操作後も、表示順どおりに全ブロックの `name="questions[n][...]"` / `name="questions[n][choices][m][...]"` の `n`/`m` を振り直す（送信データの配列順序 = 保存時の `sort_order` になるため） |
+| `resources/js/surveyForm.js` | 新規 | `data-survey-form` 要素が存在する画面でのみ初期化。設問ブロックの追加（`<template>` 複製）・削除（`confirm()` 確認後に DOM 除去）・上下移動（DOM ノード入れ替え）、単一選択/複数選択設問内の選択肢の追加・削除、設問形式（ラジオボタン）変更に応じた選択肢入力欄・段階評価ラベル入力欄の表示切替。選択肢が 2 件のときは「削除」ボタンに `disabled` を付与し 1 件まで減らせないようにする（3 件以上に戻ったら再度有効化する）。いずれの操作後も、表示順どおりに全ブロックの `name="questions[n][...]"` / `name="questions[n][choices][m][...]"` の `n`/`m` を振り直す（送信データの配列順序 = 保存時の `sort_order` になるため） |
 | `resources/js/app.js` | 変更 | `import './surveyForm'` を追加（ガード節により対象画面以外では何もしない） |
 
 <!-- resources/js/ は JavaScript のみ。TypeScript は E2E（Playwright）専用 -->
