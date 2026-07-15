@@ -3,17 +3,23 @@
 @section('title', '部署登録')
 
 @section('content')
-<div class="max-w-sm mx-auto bg-white p-6 rounded shadow">
-    <h1 class="text-lg font-bold mb-4">部署登録</h1>
+<div class="max-w-md mx-auto">
+    <h1 class="text-[22px] font-bold text-text-primary mb-6">部署登録</h1>
 
-    <form method="POST" action="{{ route('company.departments.store') }}">
-        @csrf
-        <div class="mb-3">
-            <label class="block text-sm mb-1">部署名</label>
-            <input type="text" name="name" value="{{ old('name') }}" data-testid="department-name-input" class="border rounded w-full px-2 py-1">
-            @error('name')<div class="text-red-600 text-sm" data-testid="name-error">{{ $message }}</div>@enderror
-        </div>
-        <button type="submit" data-testid="department-submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">登録</button>
-    </form>
+    <div class="rounded-[13px] border border-border-card bg-card-bg p-6">
+        <form method="POST" action="{{ route('company.departments.store') }}">
+            @csrf
+            <div class="mb-4">
+                <label class="block text-[13px] font-medium text-text-secondary mb-1">部署名</label>
+                <input type="text" name="name" value="{{ old('name') }}" data-testid="department-name-input"
+                       class="border border-border-input rounded-[8px] w-full px-3 py-2 text-[13.5px] text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-soft-border focus:border-accent">
+                @error('name')<div class="text-danger text-[12.5px] mt-1" data-testid="name-error">{{ $message }}</div>@enderror
+            </div>
+            <button type="submit" data-testid="department-submit"
+                    class="w-full rounded-[9px] bg-accent px-4 py-2 text-[13.5px] font-medium text-white shadow-[0_1px_2px_rgba(75,83,224,.3)] hover:bg-accent-dark">
+                登録
+            </button>
+        </form>
+    </div>
 </div>
 @endsection
