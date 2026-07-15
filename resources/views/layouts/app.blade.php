@@ -62,6 +62,10 @@
                        class="{{ $navItemClass(request()->routeIs('company.surveys.*')) }}">
                         アンケート
                     </a>
+                    <a href="{{ route('company.dashboard') }}" data-testid="nav-dashboard"
+                       class="{{ $navItemClass(request()->routeIs('company.dashboard')) }}">
+                        集計ダッシュボード
+                    </a>
 
                     <div class="mt-4 mb-1 px-3 text-[11px] font-semibold text-text-faint tracking-wide">組織管理</div>
                     <a href="{{ route('company.users.index') }}" data-testid="nav-users"

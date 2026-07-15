@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Company\AdminController;
+use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\Company\DepartmentController;
 use App\Http\Controllers\Company\HomeController as CompanyHomeController;
 use App\Http\Controllers\Company\SurveyController;
@@ -41,6 +42,7 @@ Route::middleware(['auth', 'active', 'role:super_user,admin', 'ctx'])
     ->name('company.')
     ->group(function () {
         Route::get('home', [CompanyHomeController::class, 'index'])->name('home');
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::get('users/csv', [UserCsvController::class, 'show'])->name('users.csv');
         Route::post('users/csv', [UserCsvController::class, 'store'])->name('users.csv.store');

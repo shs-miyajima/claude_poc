@@ -34,10 +34,11 @@
             <div class="text-[15px] font-bold">＋ 新しいアンケートを作成</div>
             <div class="text-[12.5px] text-white/80 mt-1">4つの設問形式・記名/匿名・回答期間を設定できます</div>
         </a>
-        <div class="rounded-[13px] border border-border-card bg-subtle-bg p-5 text-text-muted" data-testid="home-dashboard-link-placeholder">
+        <a href="{{ route('company.dashboard') }}" data-testid="home-dashboard-link"
+           class="rounded-[13px] border border-border-card bg-card-bg p-5 hover:bg-subtle-bg-2">
             <div class="text-[15px] font-bold text-text-secondary">集計ダッシュボードを見る</div>
-            <div class="text-[12.5px] mt-1">属性で絞り込み、グラフで回答傾向を確認（近日公開）</div>
-        </div>
+            <div class="text-[12.5px] text-text-muted mt-1">属性で絞り込み、グラフで回答傾向を確認</div>
+        </a>
     </div>
 
     <div class="rounded-[13px] border border-border-card bg-card-bg p-5 mt-4">
