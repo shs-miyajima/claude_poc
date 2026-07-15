@@ -3,8 +3,8 @@
 @section('title', 'アンケート作成')
 
 @section('content')
-<div class="max-w-3xl mx-auto">
-    <h1 class="text-lg font-bold mb-4">アンケート作成</h1>
+<div class="max-w-[760px] mx-auto">
+    <h1 class="text-[22px] font-bold text-text-primary mb-6">アンケート作成</h1>
 
     @include('company.surveys._form', ['survey' => null])
 </div>

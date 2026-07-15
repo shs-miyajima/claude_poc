@@ -38,40 +38,54 @@
         @method('PUT')
     @endif
 
-    <div class="mb-3">
-        <label class="block text-sm mb-1">タイトル</label>
-        <input type="text" name="title" value="{{ $titleValue }}" data-testid="survey-title-input" class="border rounded w-full px-2 py-1 @error('title') border-red-600 @enderror">
-        @error('title')<div class="text-red-600 text-sm" data-testid="title-error">{{ $message }}</div>@enderror
-    </div>
-
-    <div class="mb-3 flex gap-4">
-        <div>
-            <label class="block text-sm mb-1">回答期間（開始日）</label>
-            <input type="date" name="answer_start_date" value="{{ $startDateValue }}" data-testid="survey-start-date-input" class="border rounded px-2 py-1 @error('answer_start_date') border-red-600 @enderror">
-            @error('answer_start_date')<div class="text-red-600 text-sm" data-testid="answer-start-date-error">{{ $message }}</div>@enderror
+    <div class="rounded-[15px] border border-t-4 border-border-card border-t-accent bg-card-bg p-6 mb-5">
+        <div class="mb-4">
+            <input type="text" name="title" value="{{ $titleValue }}" data-testid="survey-title-input" placeholder="アンケートタイトル"
+                   class="w-full border-0 border-b {{ $errors->has('title') ? 'border-danger' : 'border-border-input' }} pb-2 text-[20px] font-bold text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent">
+            @error('title')<div class="text-danger text-[12.5px] mt-1" data-testid="title-error">{{ $message }}</div>@enderror
         </div>
-        <div>
-            <label class="block text-sm mb-1">回答期間（終了日）</label>
-            <input type="date" name="answer_end_date" value="{{ $endDateValue }}" data-testid="survey-end-date-input" class="border rounded px-2 py-1 @error('answer_end_date') border-red-600 @enderror">
-            @error('answer_end_date')<div class="text-red-600 text-sm" data-testid="answer-end-date-error">{{ $message }}</div>@enderror
+
+        <div class="flex flex-wrap items-end gap-6">
+            <div>
+                <label class="block text-[12.5px] text-text-secondary mb-1">回答開始日</label>
+                <input type="date" name="answer_start_date" value="{{ $startDateValue }}" data-testid="survey-start-date-input"
+                       class="border rounded-[8px] px-3 py-1.5 text-[13.5px] {{ $errors->has('answer_start_date') ? 'border-danger' : 'border-border-input' }} focus:outline-none focus:ring-2 focus:ring-accent-soft-border focus:border-accent">
+                @error('answer_start_date')<div class="text-danger text-[12.5px] mt-1" data-testid="answer-start-date-error">{{ $message }}</div>@enderror
+            </div>
+            <div>
+                <label class="block text-[12.5px] text-text-secondary mb-1">回答終了日</label>
+                <input type="date" name="answer_end_date" value="{{ $endDateValue }}" data-testid="survey-end-date-input"
+                       class="border rounded-[8px] px-3 py-1.5 text-[13.5px] {{ $errors->has('answer_end_date') ? 'border-danger' : 'border-border-input' }} focus:outline-none focus:ring-2 focus:ring-accent-soft-border focus:border-accent">
+                @error('answer_end_date')<div class="text-danger text-[12.5px] mt-1" data-testid="answer-end-date-error">{{ $message }}</div>@enderror
+            </div>
+            <div>
+                <span class="block text-[12.5px] text-text-secondary mb-1">記名/匿名</span>
+                <div class="inline-flex rounded-[9px] border border-border-input p-0.5 text-[12.5px]">
+                    <label class="relative cursor-pointer">
+                        <input type="radio" name="answer_visibility" value="named" data-testid="survey-visibility-named" class="peer absolute inset-0 z-10 opacity-0 cursor-pointer" @checked($visibilityValue === 'named')>
+                        <span class="inline-block rounded-[7px] px-3 py-1 text-text-secondary peer-checked:bg-accent-soft peer-checked:text-accent peer-checked:font-medium">記名</span>
+                    </label>
+                    <label class="relative cursor-pointer">
+                        <input type="radio" name="answer_visibility" value="anonymous" data-testid="survey-visibility-anonymous" class="peer absolute inset-0 z-10 opacity-0 cursor-pointer" @checked($visibilityValue === 'anonymous')>
+                        <span class="inline-block rounded-[7px] px-3 py-1 text-text-secondary peer-checked:bg-accent-soft peer-checked:text-accent peer-checked:font-medium">匿名</span>
+                    </label>
+                </div>
+                @error('answer_visibility')<div class="text-danger text-[12.5px] mt-1" data-testid="answer-visibility-error">{{ $message }}</div>@enderror
+            </div>
         </div>
     </div>
 
-    <div class="mb-3">
-        <span class="block text-sm mb-1">記名/匿名</span>
-        <label class="mr-3"><input type="radio" name="answer_visibility" value="named" data-testid="survey-visibility-named" @checked($visibilityValue === 'named')> 記名</label>
-        <label class="mr-3"><input type="radio" name="answer_visibility" value="anonymous" data-testid="survey-visibility-anonymous" @checked($visibilityValue === 'anonymous')> 匿名</label>
-        @error('answer_visibility')<div class="text-red-600 text-sm" data-testid="answer-visibility-error">{{ $message }}</div>@enderror
-    </div>
-
-    <div class="mb-3">
-        <h2 class="font-bold mb-2">設問</h2>
+    <div class="mb-5">
+        <h2 class="text-[15px] font-bold text-text-primary mb-3">設問</h2>
         <div data-testid="questions-container">
             @foreach ($questions as $qIndex => $question)
                 @include('company.surveys._question', ['question' => $question, 'qIndex' => $qIndex])
             @endforeach
         </div>
-        <button type="button" data-testid="question-add" class="px-3 py-1 border rounded">設問を追加</button>
+        <button type="button" data-testid="question-add"
+                class="w-full rounded-[10px] border border-dashed border-border-input py-3 text-[13.5px] text-text-secondary hover:border-accent hover:text-accent">
+            ＋ 設問を追加
+        </button>
     </div>
 
     <template data-testid="question-template">
@@ -82,5 +96,8 @@
         @include('company.surveys._choice', ['choice' => null, 'qIndex' => 'NEW', 'cIndex' => 'NEW'])
     </template>
 
-    <button type="submit" data-testid="survey-submit" class="bg-blue-600 text-white px-4 py-2 rounded">保存</button>
+    <button type="submit" data-testid="survey-submit"
+            class="rounded-[9px] bg-accent px-5 py-2.5 text-[13.5px] font-medium text-white shadow-[0_1px_2px_rgba(75,83,224,.3)] hover:bg-accent-dark">
+        保存
+    </button>
 </form>
