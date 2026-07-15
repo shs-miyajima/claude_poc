@@ -18,6 +18,7 @@ class SurveyController extends Controller
     {
         $surveys = Survey::query()
             ->where('company_id', app('currentCompany')->id)
+            ->withCount('questions')
             ->orderByDesc('id')
             ->paginate(20);
 
