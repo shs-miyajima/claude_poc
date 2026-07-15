@@ -83,9 +83,9 @@
                 @endif
 
                 @if ($isUser)
-                    <a href="{{ route('user.home') }}"
-                       class="{{ $navItemClass(request()->routeIs('user.home')) }}">
-                        ホーム
+                    <a href="{{ route('user.home') }}" data-testid="nav-user-surveys"
+                       class="{{ $navItemClass(request()->routeIs('user.home') || request()->routeIs('user.surveys.*')) }}">
+                        アンケート
                     </a>
                 @endif
             </nav>

@@ -11,6 +11,7 @@ use App\Http\Controllers\Company\UserCsvController;
 use App\Http\Controllers\Super\CompanyController;
 use App\Http\Controllers\Super\CompanySwitchController;
 use App\Http\Controllers\User\HomeController as UserHomeController;
+use App\Http\Controllers\User\SurveyController as UserSurveyController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -87,5 +88,7 @@ Route::middleware(['auth', 'active', 'role:super_user', 'ctx'])
     });
 
 Route::middleware(['auth', 'active', 'role:user'])
-    ->get('/home', [UserHomeController::class, 'index'])
-    ->name('user.home');
+    ->group(function () {
+        Route::get('/home', [UserHomeController::class, 'index'])->name('user.home');
+        Route::get('user/surveys/{survey}/answer', [UserSurveyController::class, 'answer'])->name('user.surveys.answer');
+    });
