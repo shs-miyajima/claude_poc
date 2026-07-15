@@ -6,6 +6,46 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Instrument Sans', 'Yu Gothic', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo,
+        ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, 'MS Gothic', monospace;
+
+    --color-accent: #4b53e0;
+    --color-accent-dark: #3a41c4;
+    --color-accent-light-from: #6d77e8;
+    --color-accent-light-to: #5e67e6;
+    --color-accent-soft: #eef0fe;
+    --color-accent-soft-border: #c9cdf5;
+
+    --color-text-primary: #171a1f;
+    --color-text-secondary: #5b6472;
+    --color-text-muted: #8b94a3;
+    --color-text-faint: #9aa2b1;
+    --color-text-placeholder: #b0b6bf;
+
+    --color-page-bg: #eceef1;
+    --color-card-bg: #ffffff;
+    --color-subtle-bg: #fafbfc;
+    --color-subtle-bg-2: #f5f6f8;
+
+    --color-border-card: #e6e8ec;
+    --color-border-divider: #eef0f3;
+    --color-border-input: #e0e3e8;
+
+    --color-success-bg: #e6f6ef;
+    --color-success-text: #0f7a52;
+    --color-success-dot: #0f9d6b;
+
+    --color-warning-bg: #fef3e2;
+    --color-warning-text: #b45309;
+
+    --color-banner-bg: #fef6e7;
+    --color-banner-text: #8a6216;
+    --color-banner-border: #f4e2b8;
+
+    --color-disabled-bg: #f1f2f4;
+    --color-disabled-text: #8b94a3;
+
+    --color-danger: #d05f5f;
 }
