@@ -16,7 +16,7 @@ class CompanyController extends Controller
 
     public function index(): View
     {
-        $companies = Company::query()->orderBy('id')->paginate(20);
+        $companies = Company::query()->withCount(['users', 'surveys'])->orderBy('id')->paginate(20);
 
         return view('super.companies.index', ['companies' => $companies]);
     }
